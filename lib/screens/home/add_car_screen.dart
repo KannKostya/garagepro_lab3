@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import '../../core/widgets/custom_button.dart';
-//import '../../core/widgets/custom_text_field.dart';
+import '../../core/widgets/custom_button.dart';
+import '../../core/widgets/custom_text_field.dart';
 import '../main_screen.dart';
 
 class AddCarScreen extends StatelessWidget {
@@ -87,7 +87,7 @@ class AddCarScreen extends StatelessWidget {
       ),
       
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
 
@@ -149,29 +149,131 @@ class AddCarScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 16),
-            
-            const Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.directions_car_outlined, size: 60, color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text('Upload Vehicle Photo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const Text('PNG, JPG, or HEIC up to 10MB', style: TextStyle(color: Colors.grey)),
-            const Divider(height: 40),
-            
+
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                color: Color(0xFFF2F4F7),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
+                    color: Color.fromARGB(5, 0, 0, 0),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+
+                  const SizedBox(height: 8),
+
+                  Center(
+                    child: Image.asset(
+                      'assets/images/AddCarTopImage.png',
+                      height: 80,
+                      width: 80,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    'Upload Vehicle Photo',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF03192A),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const Text(
+                    'PNG, JPG, or HEIC up to 10MB',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF43474C),
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          //MainScreen.of(context)?.setIndex(2);
+                        },
+                        icon: const Icon(
+                          Icons.photo_camera_outlined,
+                          size: 14,
+                          color: Color(0xFF3E6186),
+                        ),
+                        label: const Text(
+                          'Gallerey',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: Color(0xFF03192A),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFE0E3E6),
+                          elevation: 4,
+                          shadowColor: Color.fromARGB(5, 0, 0, 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          shape: const StadiumBorder(),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          //MainScreen.of(context)?.setIndex(2);
+                        },
+                        icon: const Icon(
+                          Icons.photo_camera_outlined,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'Take Shot',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF1A2E40),
+                          elevation: 4,
+                          shadowColor: Color.fromARGB(5, 0, 0, 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          shape: const StadiumBorder(),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(5, 0, 0, 0),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
                   ),
                 ],
               ),
@@ -183,7 +285,7 @@ class AddCarScreen extends StatelessWidget {
                     children: const [
                       Icon(
                         Icons.badge_outlined,
-                        color: Color(0xFF1E3A5F),
+                        color: Color(0xFF3E6186),
                         size: 22,
                       ),
                       SizedBox(width: 10),
@@ -192,35 +294,36 @@ class AddCarScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F2439),
+                          color: Color(0xFF03192A),
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   // 2. Поле: Vehicle Make *
                   _buildFieldLabel('Vehicle Make *'),
-                  const SizedBox(height: 8),
-                  _buildInputField(
-                    hintText: 'e.g. Toyota, BMW, Tesla',
-                    prefixIcon: Icons.precision_manufacturing_outlined, // Або Icons.directions_car_outlined
+                  const SizedBox(height: 4),
+                  const CustomTextField(
+                    label: 'e.g. Toyota, BMW, Tesla',
+                    prefixIcon: Icons.precision_manufacturing_outlined,
+                    bgColor: Color(0xFFF2F4F7),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
 
                   // 3. Поле: Model *
                   _buildFieldLabel('Model *'),
-                  const SizedBox(height: 8),
-                  _buildInputField(
-                    hintText: 'e.g. RAV4, Model 3, 330i',
+                  const SizedBox(height: 4),
+                  const CustomTextField(
+                    label: 'e.g. RAV4, Model 3, 330i',
                     prefixIcon: Icons.directions_car_outlined,
+                    bgColor: Color(0xFFF2F4F7),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
 
-                  // 4. Нижній рядок: Year * та Trim / Package
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -231,10 +334,11 @@ class AddCarScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildFieldLabel('Year *'),
-                            const SizedBox(height: 8),
-                            _buildInputField(
-                              hintText: '2023',
-                              keyboardType: TextInputType.number,
+                            const SizedBox(height: 4),
+                            const CustomTextField(
+                                label: '2023',
+                                bgColor: Color(0xFFF2F4F7),
+                                keyboardType: TextInputType.number,
                             ),
                           ],
                         ),
@@ -248,9 +352,10 @@ class AddCarScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildFieldLabel('Trim / Package'),
-                            const SizedBox(height: 8),
-                            _buildInputField(
-                              hintText: 'e.g. XLE Premium AWD',
+                            const SizedBox(height: 4),
+                            const CustomTextField(
+                                label: 'e.g. XLE Premium AWD',
+                                bgColor: Color(0xFFF2F4F7),
                             ),
                           ],
                         ),
@@ -259,7 +364,103 @@ class AddCarScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            )
+            ),
+
+            const SizedBox(height: 24),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(5, 0, 0, 0),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. Заголовок секції з іконкою ID-картки
+                  Row(
+                    children: const [
+                      Icon(
+                        Icons.badge_outlined,
+                        color: Color(0xFF3E6186),
+                        size: 22,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Specs & Identifiers',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF03192A),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 2. Поле: Vehicle Make *
+                  _buildFieldLabel('License Plate / Tag'),
+                  const SizedBox(height: 4),
+                  const CustomTextField(
+                    label: 'E.G. 7XYZ908',
+                    prefixIcon: Icons.grid_3x3,
+                    bgColor: Color(0xFFF2F4F7),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // 3. Поле: Model *
+                  _buildFieldLabel('VIN (Vehicle Identification Number)'),
+                  const SizedBox(height: 4),
+                  const CustomTextField(
+                    label: 'VIN (Vehicle Identification Number)',
+                    prefixIcon: Icons.directions_car_outlined,
+                    bgColor: Color(0xFFF2F4F7),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  _buildFieldLabel('Current Odometer *'),
+                  const SizedBox(height: 4),
+                  const CustomTextField(
+                    label: '42,500',
+                    prefixIcon: Icons.speed,
+                    bgColor: Color(0xFFF2F4F7),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            CustomButton(
+              text: 'Save Car to Garage',
+              icon: Icons.garage_outlined,
+              isIconOnEnd: false,
+              onPressed: () {
+                MainScreen.of(context)?.setIndex(0);
+              },
+              bgColor: Color(0xFF03192A),
+              textColor: Colors.white,
+            ),
+
+            const SizedBox(height: 10),
+
+            const Text(
+              'Service schedules and alert profiles will be auto-configured.',
+              style: TextStyle(
+                color: Color(0xFF74777D),
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
       ),
@@ -270,15 +471,15 @@ class AddCarScreen extends StatelessWidget {
     return Text(
       label,
       style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF334155),
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+        color: Color(0xFF43474C),
       ),
     );
   }
 
   // Універсальне текстове поле у сірій підкладці
-  Widget _buildInputField({
+  /*Widget _buildInputField({
     required String hintText,
     IconData? prefixIcon,
     TextInputType? keyboardType,
@@ -321,5 +522,5 @@ class AddCarScreen extends StatelessWidget {
         ),
       ),
     );
-  }
+  }*/
 }

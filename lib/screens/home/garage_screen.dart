@@ -10,10 +10,6 @@ class GarageScreen extends StatefulWidget {
 }
 
 class _GarageScreenState extends State<GarageScreen> {
-  //static const String _userName = 'Костянтин';
-  //static const String _carNumber = 'BC 1234 AH';
-  //static const String _mileage = '145 200 км';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +88,7 @@ class _GarageScreenState extends State<GarageScreen> {
       backgroundColor: const Color.fromARGB(255, 247, 249, 252),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -349,7 +345,9 @@ class _GarageScreenState extends State<GarageScreen> {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap:() => {
-                                  MainScreen.of(context)?.setIndex(3),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Car succesfully deleted!')),
+                                  )
                                 },
 
                                 child: Container(
@@ -574,7 +572,9 @@ class _GarageScreenState extends State<GarageScreen> {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap:() => {
-                                  MainScreen.of(context)?.setIndex(3),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Car succesfully deleted!')),
+                                  )
                                 },
 
                                 child: Container(
@@ -799,7 +799,9 @@ class _GarageScreenState extends State<GarageScreen> {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap:() => {
-                                  MainScreen.of(context)?.setIndex(3),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Car succesfully deleted!')),
+                                  )
                                 },
 
                                 child: Container(

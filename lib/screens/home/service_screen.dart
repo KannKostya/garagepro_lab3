@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 import '../main_screen.dart';
+import 'dart:ui';
 
-class ServiceScreen extends StatelessWidget {
+class ServiceScreen extends StatefulWidget {
   final bool showBackButton;
+  final Function(String selectedCategory)? onCategorySelected;
 
   const ServiceScreen({
     super.key,
     this.showBackButton = false,
+    this.onCategorySelected,
   });
+
+    @override
+  State<ServiceScreen> createState() => _ServiceScreenState();
+}
+
+class _ServiceScreenState extends State<ServiceScreen>{
+  bool _showFilters = true;
+
+  final List<String> _categories = [
+    'All',
+    'Maintenance',
+    'Engine',
+    'Suspension',
+    'Brakes'
+  ];
+
+  String _selectedCategory = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +105,7 @@ class ServiceScreen extends StatelessWidget {
       ),
       
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
 
@@ -93,7 +113,7 @@ class ServiceScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
 
-                if(showBackButton) ...[
+                if(widget.showBackButton) ...[
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -188,92 +208,75 @@ class ServiceScreen extends StatelessWidget {
                       size: 20,
                     ),
                     onPressed: () {
-                      // Дія при натисканні на фільтр (наприклад, відкриття модального вікна)
+                      setState(() {
+                        _showFilters = !_showFilters;
+                      });
                     },
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 16),
+            if(_showFilters) ...[
+              const SizedBox(height: 16),
+                  
+              ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse, // Дозволяє тягнути мишкою, як пальцем
+                    PointerDeviceKind.trackpad,
+                  },
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  //physics: const BouncingScrollPhysics(), // Додає плавний ефект відскоку
+                  child: Row(
+                    children: _categories.map((category) {
+                      final bool isSelected = _selectedCategory == category;
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-                  decoration: BoxDecoration(
-                    color: Color(0xFF03192A),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Text(
-                    'All',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                      color: Color(0xFFFFFFFF),
-                      letterSpacing: 0.5,
-                    ),
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedCategory = category;
+                            });
+                            widget.onCategorySelected?.call(category);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              // Активна кнопка — темно-синя, неактивні — світло-сірі
+                              color: isSelected
+                                  ? const Color(0xFF03192A)
+                                  : const Color(0xFFE6E8EB),
+                              borderRadius: BorderRadius.circular(100), // Капсульна форма
+                            ),
+                            child: Text(
+                              category,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal,
+                                // Білий текст для обраного, сірий/темний для неактивних
+                                color: isSelected
+                                    ? Colors.white
+                                    : const Color(0xFF43474C),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-                  decoration: BoxDecoration(
-                    color: Color(0xFFE6E8EB),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Text(
-                    'Maintenance',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                      color: Color(0xFF43474C),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-                  decoration: BoxDecoration(
-                    color: Color(0xFFE6E8EB),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Text(
-                    'Engine',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                      color: Color(0xFF43474C),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-                  decoration: BoxDecoration(
-                    color: Color(0xFFE6E8EB),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Text(
-                    'Suspension',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                      color: Color(0xFF43474C),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ), 
+            ],
 
             const SizedBox(height: 16),
 

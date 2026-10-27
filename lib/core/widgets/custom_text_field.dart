@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatefulWidget {
   final String label;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final bool isPassword;
   final TextEditingController? controller;
   final Color bgColor;
+  final TextInputType? keyboardType;
+  //final BorderRadius? borderRadius;
 
   const CustomTextField({
     super.key,
     required this.label,
-    required this.prefixIcon,
+    this.keyboardType,
+    this.prefixIcon,
     this.isPassword = false,
     this.controller,
     this.bgColor = const Color(0xFFE0E3E6),
+    //this.borderRadius = const BorderRadius.circular(8),
   });
 
   @override
@@ -34,17 +38,28 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
+      keyboardType: widget.keyboardType,
       // Якщо це пароль — використовуємо поточний стан, інакше текст завжди відкритий
       obscureText: widget.isPassword ? _obscureText : false,
       decoration: InputDecoration(
         filled: true,
         fillColor: widget.bgColor,
+        hoverColor: widget.bgColor,
         hintText: widget.label,
         hintStyle: const TextStyle(
           fontSize: 14,
           color: Color(0xFF9CA3AF),
         ),
-        prefixIcon: Icon(widget.prefixIcon, color: const Color(0xFF9CA3AF)),
+
+        prefixIcon: widget.prefixIcon != null
+        ? Icon(
+            widget.prefixIcon,
+            size: 20,
+            color: const Color(0xFF64748B),
+          )
+        : null,
+
+        //prefixIcon: Icon(widget.prefixIcon, color: const Color(0xFF9CA3AF)),
         // Якщо isPassword == true — показуємо кнопку-око, інакше суфікс порожній
         suffixIcon: widget.isPassword
             ? IconButton(
@@ -60,7 +75,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               )
             : null,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide.none,
         ),
       ),

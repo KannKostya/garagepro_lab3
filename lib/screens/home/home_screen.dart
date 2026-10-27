@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garagepro/screens/auth/login_screen.dart';
+import 'package:garagepro/screens/home/add_record_screen.dart';
+import 'package:garagepro/screens/home/service_screen.dart';
 import '../../core/widgets/custom_button.dart';
 import '../main_screen.dart';
 import 'garage_screen.dart';
@@ -182,7 +183,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           textColor: Color(0xFFFFFFFF),
                           isIconOnEnd: false,
                           onPressed: () {
-                            MainScreen.of(context)?.setIndex(1);
+                            MainScreen.of(context)?.navigateToServiceWithScreen(
+                              AddRecordScreen(showBackButton: true),
+                            );
+
                           },
                         ),
                       ),
@@ -202,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               context,
                               MaterialPageRoute(builder: (_) => const GarageScreen()),
                             );
+                            
                           },
                         ),
                       ),
@@ -376,9 +381,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 TextButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    MainScreen.of(context)?.navigateToServiceWithScreen(
+                      ServiceScreen(showBackButton: true,),
                     );
                   },
                   child: const Text(

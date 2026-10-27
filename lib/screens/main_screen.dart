@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'home/home_screen.dart';
-//import 'home/garage_screen.dart'; 
+import 'home/garage_screen.dart';
 import 'home/add_car_screen.dart';
 import 'home/service_screen.dart';
 import 'profile/profile_screen.dart';
@@ -29,6 +27,10 @@ class _MainScreenState extends State<MainScreen> {
   // Окремий ключ навігації суто для вкладки Garage
   final GlobalKey<NavigatorState>
   _garageNavigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState>
+  _serviceNavigatorKey = GlobalKey<NavigatorState>();
+
+  bool _isOpenedFromButton = false;
 
   @override
   void initState() {
@@ -36,7 +38,32 @@ class _MainScreenState extends State<MainScreen> {
     _currentIndex = widget.initialIndex;
   }
 
-  bool _isOpenedFromButton = false;
+  // МЕТОД ДЛЯ ПЕРЕХОДУ НА ВКЛАДКУ SERVICE З ВІДКРИТТЯМ КОНКРЕТНОГО ЕКРАНА
+  void navigateToServiceWithScreen(Widget screen) {
+    setState(() {
+      _currentIndex = 1; // 1 — індекс вкладки Service
+    });
+
+    // Після оновлення стану додаємо новий екран у стек навігатора Service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _serviceNavigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (context) => screen),
+      );
+    });
+  }
+  
+  void navigateToGarageWithScreen(Widget screen) {
+    setState(() {
+      _currentIndex = 0; // 0 — індекс вкладки Garage
+    });
+
+    // Після оновлення стану додаємо новий екран у стек навігатора Garage
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _garageNavigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (context) => screen),
+      );
+    });
+  }
   
   void setIndex(int index) {
     setState(() {
@@ -47,66 +74,96 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          Navigator(
-            key: _garageNavigatorKey,
-            onGenerateRoute: (RouteSettings settings) {
-              return MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              );
-            },
-          ),
-          ServiceScreen(showBackButton: _isOpenedFromButton),
-          AddCarScreen(showBackButton: _isOpenedFromButton),
-          ProfileScreen(showBackButton: _isOpenedFromButton),
-        ],
-      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, resutl) async{
+        // 2. Обробка повернення назад залежно від того, яка вкладка активна
+        if (_currentIndex == 0 &&
+            _garageNavigatorKey.currentState != null &&
+            _garageNavigatorKey.currentState!.canPop()) {
+          // Якщо в Garage є попередній екран — повертаємося всередині Garage
+          _garageNavigatorKey.currentState!.pop();
+        } else if (_currentIndex == 1 &&
+            _serviceNavigatorKey.currentState != null &&
+            _serviceNavigatorKey.currentState!.canPop()) {
+          // Якщо в Service є попередній екран — повертаємося всередині Service
+          _serviceNavigatorKey.currentState!.pop();
+        } else if (_currentIndex != 0) {
+          // Якщо ми на будь-якій іншій вкладці і стек чистий — повертаємося на першу (Garage)
+          setState(() {
+            _currentIndex = 0;
+          });
+        }
+      },
 
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: Color(0xFFFFFFFF),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromARGB(4, 0, 0, 0),
-              offset: const Offset(0, -1),
-              blurRadius: 8,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        body: IndexedStack(
+          index: _currentIndex,
+          children: [
+            Navigator(
+              key: _garageNavigatorKey,
+              onGenerateRoute: (RouteSettings settings) {
+                return MaterialPageRoute(
+                  builder: (context) => const GarageScreen(),
+                );
+              },
             ),
+            Navigator(
+              key: _serviceNavigatorKey,
+              onGenerateRoute: (RouteSettings settings) {
+                return MaterialPageRoute(
+                  builder:(context) => 
+                  ServiceScreen(showBackButton: _isOpenedFromButton),
+                );
+              },
+            ),
+            AddCarScreen(showBackButton: _isOpenedFromButton),
+            ProfileScreen(showBackButton: _isOpenedFromButton),
           ],
         ),
-        child: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                index: 0,
-                icon: Icons.directions_car_outlined,
-                label: 'Garage',
-              ),
-              _buildNavItem(
-                index: 1,
-                icon: Icons.build_outlined,
-                label: 'Service',
-              ),
-              _buildNavItem(
-                index: 2,
-                icon: Icons.add_circle_outline,
-                label: 'Add Car',
-              ),
-              _buildNavItem(
-                index: 3,
-                icon: Icons.person_outline,
-                label: 'Profile',
+
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Color(0xFFFFFFFF),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(4, 0, 0, 0),
+                offset: const Offset(0, -1),
+                blurRadius: 8,
               ),
             ],
           ),
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(
+                  index: 0,
+                  icon: Icons.directions_car_outlined,
+                  label: 'Garage',
+                ),
+                _buildNavItem(
+                  index: 1,
+                  icon: Icons.build_outlined,
+                  label: 'Service',
+                ),
+                _buildNavItem(
+                  index: 2,
+                  icon: Icons.add_circle_outline,
+                  label: 'Add Car',
+                ),
+                _buildNavItem(
+                  index: 3,
+                  icon: Icons.person_outline,
+                  label: 'Profile',
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+      )
     );
   }
 
@@ -119,6 +176,11 @@ class _MainScreenState extends State<MainScreen> {
 
     return GestureDetector(
       onTap: () {
+        if (index == 1) {
+          // Скидаємо всі дочірні екрани сервісу назад до кореневого (ServiceHomeScreen)
+          _serviceNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+        }
+
         setState(() {
           _currentIndex = index;
           _isOpenedFromButton = false;

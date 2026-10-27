@@ -3,8 +3,9 @@ import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_text_field.dart';
 import '../auth/login_screen.dart';
 import '../main_screen.dart';
+import '../home/garage_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final bool showBackButton;
 
   const ProfileScreen({
@@ -12,9 +13,11 @@ class ProfileScreen extends StatelessWidget {
     this.showBackButton = false,
   });
 
-  static const String _name = 'Kostiantyn Kann';
-  static const String _email = 'example@driver.com';
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
+class _ProfileScreenState extends State<ProfileScreen>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +94,7 @@ class ProfileScreen extends StatelessWidget {
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
 
@@ -99,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
 
-                if(showBackButton) ...[
+                if(widget.showBackButton) ...[
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -135,24 +138,322 @@ class ProfileScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
+                const SizedBox(height: 44),
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
-
-            const Center(
-              child: CircleAvatar(
+            Center(
+              /*child: CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.blueAccent,
                 child: Icon(Icons.person, size: 60, color: Colors.white),
+              ),*/
+
+              child: Image.asset(
+                'assets/images/profileTop.png',
+                height: 136,
+                width: 135,
               ),
             ),
-            const SizedBox(height: 12),
-            const Text(_name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const Text(_email, style: TextStyle(color: Colors.grey)),
-            const Divider(height: 40),
-            const Align(
+
+            const Text(
+              'Kostiantyn Kann',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF191C1E),
+              ),
+            ),
+
+            const Text(
+              'example@driver.com',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF43474C),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Color(0xFFF2F4F7),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(5, 0, 0, 0),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFAFD2FD),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(
+                          Icons.drive_eta_outlined,
+                          color: Color(0xFF375A7F),
+                          size: 24,
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Registered Garage',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF191C1E),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Text(
+                            '3 vehicles currently tracked',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF43474C),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      MainScreen.of(context)?.navigateToGarageWithScreen(
+                        GarageScreen(),
+                      );
+                    },
+                    label: const Text(
+                      'View All',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                        color: Color(0xFFFFFFFF),
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF03192A),
+                      elevation: 4,
+                      shadowColor: Color.fromARGB(5, 0, 0, 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      shape: const StadiumBorder(),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ],
+              ),
+              
+            ),
+            
+            const SizedBox(height: 24),
+
+            Container(
+              decoration: BoxDecoration(
+                //color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(5, 0, 0, 0),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Theme(
+                // Прибираємо стандартні лінії-розділювачі ExpansionTile зверху і знизу
+                data: Theme.of(context).copyWith(
+                  dividerColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+                child: ExpansionTile(
+                  // 1. Задаємо колір фону прямо тут (без зовнішнього Container)
+                  backgroundColor: Color(0xFFF2F4F7),
+                  collapsedBackgroundColor: Color(0xFFF2F4F7),
+
+                  // 2. Задаємо форму із заокругленням кутів (щоб виділення не вилазило по кутах)
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide.none, // Прибирає межі
+                  ),
+                  collapsedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide.none,
+                  ),
+
+                  // 3. ПОВНІСТЮ ВИМИКАЄМО ВИДІЛЕННЯ (при наведенні / натисканні не буде жодного сліду)
+                  splashColor: Colors.transparent,
+                  //highlightColor: Colors.transparent,
+                  //hoverColor: Colors.transparent, // Прибирає виділення при наведенні курсора на вебі/десктопі
+
+                  initiallyExpanded: true,
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+
+                  leading: const Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF191C1E),
+                    size: 16,
+                  ),
+                  title: const Text(
+                    'Edit Personal Info',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      color: Color(0xFF191C1E),
+                    ),
+                  ),
+                  trailing: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF191C1E),
+                  ),
+                  // 4. Вміст, який показується при розгортанні
+                  children: [
+                    _buildInputField(
+                      //controller: _nameController,
+                      hintText: 'Change name...',
+                      onApply: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Name succesfully changed!')),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _buildInputField(
+                      //controller: _emailController,
+                      hintText: 'Change eMail...',
+                      keyboardType: TextInputType.emailAddress,
+                      onApply: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('eMail succesfully changed!')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+             const SizedBox(height: 16),
+
+            Container(
+              decoration: BoxDecoration(
+                //color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(5, 0, 0, 0),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Theme(
+                // Прибираємо стандартні лінії-розділювачі ExpansionTile зверху і знизу
+                data: Theme.of(context).copyWith(
+                  dividerColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+                child: ExpansionTile(
+                  // 1. Задаємо колір фону прямо тут (без зовнішнього Container)
+                  backgroundColor: Color(0xFFF2F4F7),
+                  collapsedBackgroundColor: Color(0xFFF2F4F7),
+
+                  // 2. Задаємо форму із заокругленням кутів (щоб виділення не вилазило по кутах)
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide.none, // Прибирає межі
+                  ),
+                  collapsedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide.none,
+                  ),
+
+                  // 3. ПОВНІСТЮ ВИМИКАЄМО ВИДІЛЕННЯ (при наведенні / натисканні не буде жодного сліду)
+                  splashColor: Colors.transparent,
+                  //highlightColor: Colors.transparent,
+                  //hoverColor: Colors.transparent, // Прибирає виділення при наведенні курсора на вебі/десктопі
+
+                  initiallyExpanded: true,
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+
+                  leading: const Icon(
+                    Icons.lock_outline,
+                    color: Color(0xFF191C1E),
+                    size: 16,
+                  ),
+                  title: const Text(
+                    'Change Password',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      color: Color(0xFF191C1E),
+                    ),
+                  ),
+                  trailing: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF191C1E),
+                  ),
+                  // 4. Вміст, який показується при розгортанні
+                  children: [
+
+                    const CustomTextField(
+                      label: 'Enter old password...',
+                      prefixIcon: Icons.lock_reset,
+                      isPassword: true,
+                      bgColor: Colors.white,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    const CustomTextField(
+                      label: 'Enter new password...',
+                      prefixIcon: Icons.lock_reset,
+                      isPassword: true,
+                      bgColor: Colors.white,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    CustomButton(
+                      text: 'Change Password',
+                      bgColor: Color(0xFF03192A),
+                      textColor: Color(0xFFFFFFFF),
+                      icon: Icons.check_circle_outline,
+                      isIconOnEnd: false,
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Password succesfully changed!')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+           /* const Align(
               alignment: Alignment.centerLeft,
               child: Text('Change Password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
@@ -167,22 +468,14 @@ class ProfileScreen extends StatelessWidget {
               label: 'New password',
               prefixIcon: Icons.lock_reset,
               isPassword: true,
-            ),
-            const SizedBox(height: 20),
-            CustomButton(
-              text: 'Change Password',
-              bgColor: Color(0xFF03192A),
-              textColor: Color(0xFFFFFFFF),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Password succesfully changed!')),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
+            ),*/
+            const SizedBox(height: 24),
+            
             CustomButton(
               text: 'Log out',
               isOutlined: false,
+              icon: Icons.logout,
+              isIconOnEnd: false,
               bgColor: Color(0xFFFFDAD6),
               textColor: Color(0xFF93000A),
 
@@ -196,6 +489,84 @@ class ProfileScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Допоміжний метод для рядка введення з кнопкою Apply
+  Widget _buildInputField({
+    TextEditingController? controller,
+    required String hintText,
+    required VoidCallback onApply,
+    TextInputType? keyboardType,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF), // Світло-сіра капсульна підкладка
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          // Іконка олівця
+          const Icon(
+            Icons.edit_outlined,
+            size: 18,
+            color: Color(0xFF64748B),
+          ),
+          const SizedBox(width: 10),
+
+          // Поле введення тексту
+          Expanded(
+            child: TextField(
+              controller: controller,
+              keyboardType: keyboardType,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0xFF0F2439),
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                filled: false,
+                fillColor: Colors.transparent,
+                hintText: hintText,
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF64748B),
+                  fontWeight: FontWeight.w400,
+                ),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 8),
+
+          // Капсульна кнопка Apply
+          ElevatedButton(
+            onPressed: onApply,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1A2E40), // Темно-синій/майже чорний
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: const Text(
+              'Apply',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
