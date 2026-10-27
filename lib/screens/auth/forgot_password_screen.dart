@@ -206,7 +206,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const Icon(
-                          Icons.check_circle_outline,
+                          Icons.lock_reset_sharp,
                           color: Color(0xFF3E6186),
                           size: 15,
                         ),

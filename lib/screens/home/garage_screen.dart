@@ -241,7 +241,7 @@ class _GarageScreenState extends State<GarageScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: const Text(
-                                  'ABC-1234',
+                                  'AB-1234-CE',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.normal,
@@ -468,7 +468,7 @@ class _GarageScreenState extends State<GarageScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: const Text(
-                                  'XYZ-9876',
+                                  'BA-9876-AB',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.normal,
@@ -695,7 +695,7 @@ class _GarageScreenState extends State<GarageScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: const Text(
-                                  'BMW-3281',
+                                  'BM-1234-MB',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.normal,

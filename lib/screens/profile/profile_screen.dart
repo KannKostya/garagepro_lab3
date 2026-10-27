@@ -452,23 +452,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 ),
               ),
             ),
-
-           /* const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Change Password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 16),
-            const CustomTextField(
-              label: 'Old Password',
-              prefixIcon: Icons.lock_clock_outlined,
-              isPassword: true,
-            ),
-            const SizedBox(height: 12),
-            const CustomTextField(
-              label: 'New password',
-              prefixIcon: Icons.lock_reset,
-              isPassword: true,
-            ),*/
             const SizedBox(height: 24),
             
             CustomButton(

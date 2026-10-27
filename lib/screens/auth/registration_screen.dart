@@ -71,7 +71,7 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Column(
             children: [
 
@@ -133,7 +133,7 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                     const SizedBox(height: 6),
 
                     const CustomTextField(
-                      label: 'e. g. Alex Morgan',
+                      label: 'e.g. Kostiantyn Kann',
                       prefixIcon: Icons.person_outline,
                     ),
 
@@ -157,14 +157,29 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
                     const SizedBox(height: 16),
 
-                    const Text(
-                      'Password',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF43474C),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Password',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF43474C),
+                          ),
+                        ),
+
+                        const Text(
+                          '8+ characters',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF74777D),
+                          ),
+                        ),
+                      ],
                     ),
+                    
 
                     const SizedBox(height: 6),
 
@@ -276,6 +291,8 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                 ),
               ),
 
+              const SizedBox(height: 10),
+              
               Row(
                 children: [
                   Expanded(
@@ -289,8 +306,8 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                     child: Text(
                       'OR SIGN UP WITH',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
+                        fontWeight: FontWeight.normal,
                         color: Colors.grey.shade500,
                         letterSpacing: 0.5,
                       ),
@@ -305,7 +322,7 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               // 2. Рядок із двома кнопками (Google та Apple)
               Row(

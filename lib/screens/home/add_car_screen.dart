@@ -421,7 +421,7 @@ class AddCarScreen extends StatelessWidget {
                   _buildFieldLabel('VIN (Vehicle Identification Number)'),
                   const SizedBox(height: 4),
                   const CustomTextField(
-                    label: 'VIN (Vehicle Identification Number)',
+                    label: '1HGCR2F83HA. . .',
                     prefixIcon: Icons.directions_car_outlined,
                     bgColor: Color(0xFFF2F4F7),
                   ),

@@ -17,7 +17,15 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String _carModel = '2022 Volkswagen Tiguan';
   //static const String _carNumber = 'BC 1234 AH';
   //static const String _mileage = '145 200 км';
+  final List<String> _periods = [
+    'This Month',
+    'Last Month',
+    'This Year',
+    'All Time',
+  ];
 
+  String _selectedPeriod = 'This Month';
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -252,20 +260,38 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Text(
-                                  'This Month',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF333333),
+                              children: [
+
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: _selectedPeriod,
+                                    isDense: true, // Зменшує вертикальні відступи
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 18,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                    dropdownColor: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF333333),
+                                    ),
+                                    items: _periods.map((String period) {
+                                      return DropdownMenuItem<String>(
+                                        value: period,
+                                        child: Text(period),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      if (newValue != null) {
+                                        setState(() {
+                                          _selectedPeriod = newValue;
+                                        });
+                                      }
+                                    },
                                   ),
-                                ),
-                                SizedBox(width: 2),
-                                Icon(
-                                  Icons.keyboard_arrow_down,
-                                  size: 12,
-                                  color: Color(0xFF333333),
                                 ),
                               ],
                             ),
@@ -350,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 2),
                         // Головне значення
                         const Text(
-                          'In 1,500 km',
+                          'In 500 km',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
