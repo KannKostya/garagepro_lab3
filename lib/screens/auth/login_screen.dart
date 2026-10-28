@@ -14,7 +14,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Контролери для зчитування введеного тексту
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isChecked = false;
@@ -175,10 +174,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               activeColor: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2.5), // Закруглення кутиків квадрата
+                                borderRadius: BorderRadius.circular(2.5),
                               ),
                               side: BorderSide(
-                                color: Color(0xFF767676), // Колір рамки в неактивному стані
+                                color: Color(0xFF767676),
                                 width: 1,
                               ),
                             ),
@@ -218,7 +217,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       bgColor: Color(0xFF03192A),
                       textColor: Color(0xFFFFFFFF),
                       onPressed: () {
-                        // Без бекенду: перехід одразу на головний екран
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => const MainScreen()),

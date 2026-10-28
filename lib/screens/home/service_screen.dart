@@ -120,17 +120,17 @@ class _ServiceScreenState extends State<ServiceScreen>{
                     onTap: () {
                       MainScreen.of(context)?.setIndex(0);
                     },
-                    customBorder: const CircleBorder(), // Робить хвилю натискання круглою
+                    customBorder: const CircleBorder(),
                     child: Container(
-                      width: 44, // Розмір кнопки
+                      width: 44,
                       height: 44,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFECEEF1), // Світло-сірий фон кола
+                        color: Color(0xFFECEEF1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF0F2439), // Темно-синій/чорний колір стрілки
+                        color: Color(0xFF0F2439),
                         size: 20,
                       ),
                     ),
@@ -224,13 +224,12 @@ class _ServiceScreenState extends State<ServiceScreen>{
                 behavior: ScrollConfiguration.of(context).copyWith(
                   dragDevices: {
                     PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse, // Дозволяє тягнути мишкою, як пальцем
+                    PointerDeviceKind.mouse,
                     PointerDeviceKind.trackpad,
                   },
                 ),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  //physics: const BouncingScrollPhysics(), // Додає плавний ефект відскоку
                   child: Row(
                     children: _categories.map((category) {
                       final bool isSelected = _selectedCategory == category;
@@ -251,18 +250,16 @@ class _ServiceScreenState extends State<ServiceScreen>{
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              // Активна кнопка — темно-синя, неактивні — світло-сірі
                               color: isSelected
                                   ? const Color(0xFF03192A)
                                   : const Color(0xFFE6E8EB),
-                              borderRadius: BorderRadius.circular(100), // Капсульна форма
+                              borderRadius: BorderRadius.circular(100),
                             ),
                             child: Text(
                               category,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.normal,
-                                // Білий текст для обраного, сірий/темний для неактивних
                                 color: isSelected
                                     ? Colors.white
                                     : const Color(0xFF43474C),
@@ -289,16 +286,14 @@ class _ServiceScreenState extends State<ServiceScreen>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Верхній рядок: Іконка, Назва, Дата/Пробіг та Статус
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Блакитна підкладка з іконкою гальмівного диска / деталі
                       Container(
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFAFD2FD), // Блакитна підкладка
+                          color: const Color(0xFFAFD2FD),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Icon(
@@ -334,7 +329,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
                         ),
                       ),
 
-                      // Темна капсула статусу Completed
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(
@@ -355,7 +349,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 2. Внутрішній блок подробиць (Parts, Shop)
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -413,7 +406,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 3. Нижній рядок: Ціна та дія View Receipt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -427,7 +419,7 @@ class _ServiceScreenState extends State<ServiceScreen>{
                       ),
                       InkWell(
                         onTap: () {
-                          // Відкрити чек / деталі квитанції
+                          //
                         },
                         borderRadius: BorderRadius.circular(6),
                         child: Row(
@@ -438,7 +430,7 @@ class _ServiceScreenState extends State<ServiceScreen>{
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF3F6D9B), // Акцентний синій колір посилання
+                                color: Color(0xFF3F6D9B), 
                               ),
                             ),
                             SizedBox(width: 2),
@@ -510,7 +502,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
                         ),
                       ),
 
-                      // Темна капсула статусу Completed
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(
@@ -531,7 +522,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 2. Внутрішній блок подробиць (Parts, Shop)
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -589,7 +579,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 3. Нижній рядок: Ціна та дія View Receipt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -603,7 +592,7 @@ class _ServiceScreenState extends State<ServiceScreen>{
                       ),
                       InkWell(
                         onTap: () {
-                          // Відкрити чек / деталі квитанції
+                          //
                         },
                         borderRadius: BorderRadius.circular(6),
                         child: Row(
@@ -686,7 +675,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
                         ),
                       ),
 
-                      // Темна капсула статусу Completed
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(
@@ -707,7 +695,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 2. Внутрішній блок подробиць (Parts, Shop)
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -765,7 +752,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 3. Нижній рядок: Ціна та дія View Receipt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -779,7 +765,7 @@ class _ServiceScreenState extends State<ServiceScreen>{
                       ),
                       InkWell(
                         onTap: () {
-                          // Відкрити чек / деталі квитанції
+                          //
                         },
                         borderRadius: BorderRadius.circular(6),
                         child: Row(
@@ -862,7 +848,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
                         ),
                       ),
 
-                      // Темна капсула статусу Completed
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(
@@ -883,7 +868,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 2. Внутрішній блок подробиць (Parts, Shop)
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -941,7 +925,6 @@ class _ServiceScreenState extends State<ServiceScreen>{
 
                   const SizedBox(height: 8),
 
-                  // 3. Нижній рядок: Ціна та дія View Receipt
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -955,7 +938,7 @@ class _ServiceScreenState extends State<ServiceScreen>{
                       ),
                       InkWell(
                         onTap: () {
-                          // Відкрити чек / деталі квитанції
+                          //
                         },
                         borderRadius: BorderRadius.circular(6),
                         child: Row(

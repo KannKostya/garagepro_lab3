@@ -167,17 +167,17 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
                     onTap: () {
                       MainScreen.of(context)?.setIndex(0);
                     },
-                    customBorder: const CircleBorder(), // Робить хвилю натискання круглою
+                    customBorder: const CircleBorder(),
                     child: Container(
-                      width: 44, // Розмір кнопки
+                      width: 44,
                       height: 44,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFECEEF1), // Світло-сірий фон кола
+                        color: Color(0xFFECEEF1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF0F2439), // Темно-синій/чорний колір стрілки
+                        color: Color(0xFF0F2439),
                         size: 20,
                       ),
                     ),
@@ -313,7 +313,6 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Поле Year (фіксована ширина або менша частка)
                       SizedBox(
                         width: 147,
                         child: Column(
@@ -333,7 +332,6 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
 
                       const SizedBox(width: 16),
 
-                      // Поле Trim / Package (займає весь залишковий простір)
                       SizedBox(
                         width: 147,
                         child: Column(
@@ -368,13 +366,13 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
                   const SizedBox(height: 4),
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF), // М'який сірий фон капсули
+                      color: const Color(0xFFFFFFFF),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: TextField(
-                      maxLines: 5, // Кількість видимих рядків за замовчуванням
-                      minLines: 2, // Мінімальна висота поля в рядках
-                      keyboardType: TextInputType.multiline, // Увімкнення перенесення рядків на клавіатурі
+                      maxLines: 5,
+                      minLines: 2,
+                      keyboardType: TextInputType.multiline,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF0F2439),
@@ -386,14 +384,13 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         
-                        // Іконка списку/абзацу (Icons.notes або Icons.subject)
                         prefixIcon: const Padding(
                           padding: EdgeInsets.only(left: 4, right: 8, top: 0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                Icons.notes, // Або Icons.menu, Icons.subject_rounded
+                                Icons.notes,
                                 color: Color(0xFF64748B),
                                 size: 22,
                               ),
@@ -407,10 +404,10 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
 
                         hintText: 'Add details about parts used,\nmechanics, or warranty info...',
                         hintStyle: const TextStyle(
-                          color: Color(0xFF9CA3AF), // Світло-сірий плейсхолдер
+                          color: Color(0xFF9CA3AF),
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
-                          height: 1.4, // Міжрядковий інтервал для зручного читання
+                          height: 1.4,
                         ),
                       ),
                     ),
@@ -421,33 +418,32 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
                   const SizedBox(height: 4),
                   CustomPaint(
                     foregroundPainter: _DashedRectPainter(
-                      color: const Color(0xFFC3C7CD), // Світло-сірий колір пунктирної рамки
+                      color: const Color(0xFFC3C7CD),
                       strokeWidth: 1.5,
-                      radius: 16.0, // Радіус заокруглення кутів
-                      gap: 5.0,     // Відстань між штрихами
-                      dash: 6.0,    // Довжина одного штриха
+                      radius: 16.0,
+                      gap: 5.0,
+                      dash: 6.0,
                     ),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFFFF), // Дуже світлий фоновий колір
+                        color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Кругла плашка з іконкою камери
                           Container(
                             width: 52,
                             height: 52,
                             decoration: const BoxDecoration(
-                              color: Color(0xFFE2E8F0), // Сірий кружечок
+                              color: Color(0xFFE2E8F0),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
-                              Icons.camera_alt, // Або Icons.photo_camera_rounded
-                              color: Color(0xFF0F2439), // Темний колір камери
+                              Icons.camera_alt,
+                              color: Color(0xFF0F2439),
                               size: 24,
                             ),
                           ),
@@ -465,7 +461,6 @@ class _AddRecordScreenState extends State<AddRecordScreen>{
                           ),
                           const SizedBox(height: 4),
 
-                          // Підпис форматів і ліміту
                           const Text(
                             'Supports PNG, JPG, or PDF up to 10MB',
                             textAlign: TextAlign.center,

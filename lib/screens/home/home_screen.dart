@@ -13,10 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  //static const String _userName = 'Костянтин';
   static const String _carModel = '2022 Volkswagen Tiguan';
-  //static const String _carNumber = 'BC 1234 AH';
-  //static const String _mileage = '145 200 км';
+
   final List<String> _periods = [
     'This Month',
     'Last Month',
@@ -229,19 +227,17 @@ class _HomeScreenState extends State<HomeScreen> {
             
             Row(
               children: [
-                // Ліва картка: Total Expenses
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     height: 144, 
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2F4F7), // Світло-сірий фон картки
+                      color: const Color(0xFFF2F4F7),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Верхній рядок: іконка та дропдаун/фільтр
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -249,11 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD6E4F0), // Блакитна підкладка під іконку
+                                color: const Color(0xFFD6E4F0),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Icon(
-                                Icons.payments_outlined, // Або Icons.account_balance_wallet_outlined
+                                Icons.payments_outlined,
                                 color: Color(0xFF1D3557),
                                 size: 22,
                               ),
@@ -265,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
                                     value: _selectedPeriod,
-                                    isDense: true, // Зменшує вертикальні відступи
+                                    isDense: true,
                                     icon: const Icon(
                                       Icons.keyboard_arrow_down_rounded,
                                       size: 18,
@@ -298,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        // Підпис
+
                         const Text(
                           'Total Expenses',
                           style: TextStyle(
@@ -322,21 +318,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                const SizedBox(width: 16), // Відступ між картками
+                const SizedBox(width: 16),
 
-                // Права картка: Next Oil Change
                 Expanded(
                   child: Container(
                     height: 144, 
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2F4F7), // Світло-сірий фон картки
+                      color: const Color(0xFFF2F4F7),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Верхній рядок: іконка та статусний бейдж
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -344,12 +338,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF9EAE1), // Бежева/персикова підкладка
+                                color: const Color(0xFFF9EAE1),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Icon(
-                                Icons.oil_barrel, // Або Icons.water_drop, Icons.local_gas_station
-                                color: Color(0xFF6B4210), // Коричневий акцент бочки
+                                Icons.oil_barrel,
+                                color: Color(0xFF6B4210),
                                 size: 22,
                               ),
                             ),
@@ -358,13 +352,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFFC77728), // Теплий помаранчевий статус
+                                color: Color(0xFFC77728),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        // Підпис
+
                         const Text(
                           'Next Oil Change',
                           style: TextStyle(
@@ -374,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        // Головне значення
+
                         const Text(
                           'In 500 km',
                           style: TextStyle(
@@ -429,21 +423,21 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F4F6), // М'який світло-сірий фон картки
+                color: const Color(0xFFF1F4F6),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: [
-                  // 1. Іконка на підкладці
+
                   Container(
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE2E7EC), // Трохи темніша сіро-блакитна підкладка
+                      color: const Color(0xFFE2E7EC),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(
-                      Icons.settings_outlined, // Або Icons.build_outlined, Icons.auto_fix_high
+                      Icons.settings_outlined,
                       color: Color(0xFF0F2439),
                       size: 24,
                     ),
@@ -451,7 +445,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(width: 14),
 
-                  // 2. Центральний блок з назвою, датою та статусом
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD6E6F8), // Ніжно-блакитний бейдж
+                                color: const Color(0xFFD6E6F8),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Text(
@@ -498,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1D4ED8), // Темно-синій текст статусу
+                                  color: Color(0xFF1D4ED8),
                                 ),
                               ),
                             ),
@@ -510,7 +503,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(width: 12),
 
-                  // 3. Правий блок (Ціна та назва автомайстерні)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: const [
@@ -542,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F4F6), // М'який світло-сірий фон картки
+                color: const Color(0xFFF1F4F6),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -552,11 +544,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE2E7EC), // Трохи темніша сіро-блакитна підкладка
+                      color: const Color(0xFFE2E7EC),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(
-                      Icons.rotate_right_sharp, // Або Icons.build_outlined, Icons.auto_fix_high
+                      Icons.rotate_right_sharp,
                       color: Color(0xFF0F2439),
                       size: 24,
                     ),
@@ -564,7 +556,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(width: 14),
 
-                  // 2. Центральний блок з назвою, датою та статусом
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD6E6F8), // Ніжно-блакитний бейдж
+                                color: const Color(0xFFD6E6F8),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Text(
@@ -611,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1D4ED8), // Темно-синій текст статусу
+                                  color: Color(0xFF1D4ED8),
                                 ),
                               ),
                             ),
@@ -623,7 +614,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(width: 12),
 
-                  // 3. Правий блок (Ціна та назва автомайстерні)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: const [

@@ -29,7 +29,7 @@ class CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           backgroundColor: bgColor,
         ),
-        //suffixIcon: Icon(postfixIcon, color: const Color(0xFF9CA3AF)),
+        
         onPressed: onPressed,
         child: Row(
           mainAxisSize: MainAxisSize.min,

@@ -109,17 +109,17 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     onTap: () {
                       MainScreen.of(context)?.setIndex(0);
                     },
-                    customBorder: const CircleBorder(), // Робить хвилю натискання круглою
+                    customBorder: const CircleBorder(),
                     child: Container(
-                      width: 44, // Розмір кнопки
+                      width: 44,
                       height: 44,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFECEEF1), // Світло-сірий фон кола
+                        color: Color(0xFFECEEF1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF0F2439), // Темно-синій/чорний колір стрілки
+                        color: Color(0xFF0F2439),
                         size: 20,
                       ),
                     ),
@@ -146,12 +146,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
             const SizedBox(height: 24),
 
             Center(
-              /*child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blueAccent,
-                child: Icon(Icons.person, size: 60, color: Colors.white),
-              ),*/
-
               child: Image.asset(
                 'assets/images/profileTop.png',
                 height: 136,
@@ -279,18 +273,15 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 ],
               ),
               child: Theme(
-                // Прибираємо стандартні лінії-розділювачі ExpansionTile зверху і знизу
                 data: Theme.of(context).copyWith(
                   dividerColor: Colors.transparent,
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                 ),
                 child: ExpansionTile(
-                  // 1. Задаємо колір фону прямо тут (без зовнішнього Container)
                   backgroundColor: Color(0xFFF2F4F7),
                   collapsedBackgroundColor: Color(0xFFF2F4F7),
 
-                  // 2. Задаємо форму із заокругленням кутів (щоб виділення не вилазило по кутах)
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide.none, // Прибирає межі
@@ -300,10 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     side: BorderSide.none,
                   ),
 
-                  // 3. ПОВНІСТЮ ВИМИКАЄМО ВИДІЛЕННЯ (при наведенні / натисканні не буде жодного сліду)
                   splashColor: Colors.transparent,
-                  //highlightColor: Colors.transparent,
-                  //hoverColor: Colors.transparent, // Прибирає виділення при наведенні курсора на вебі/десктопі
 
                   initiallyExpanded: true,
                   tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -326,10 +314,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     Icons.keyboard_arrow_down,
                     color: Color(0xFF191C1E),
                   ),
-                  // 4. Вміст, який показується при розгортанні
                   children: [
                     _buildInputField(
-                      //controller: _nameController,
                       hintText: 'Change name...',
                       onApply: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -339,7 +325,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     ),
                     const SizedBox(height: 16),
                     _buildInputField(
-                      //controller: _emailController,
                       hintText: 'Change eMail...',
                       keyboardType: TextInputType.emailAddress,
                       onApply: () {
@@ -368,18 +353,15 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 ],
               ),
               child: Theme(
-                // Прибираємо стандартні лінії-розділювачі ExpansionTile зверху і знизу
                 data: Theme.of(context).copyWith(
                   dividerColor: Colors.transparent,
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                 ),
                 child: ExpansionTile(
-                  // 1. Задаємо колір фону прямо тут (без зовнішнього Container)
                   backgroundColor: Color(0xFFF2F4F7),
                   collapsedBackgroundColor: Color(0xFFF2F4F7),
 
-                  // 2. Задаємо форму із заокругленням кутів (щоб виділення не вилазило по кутах)
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide.none, // Прибирає межі
@@ -389,10 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     side: BorderSide.none,
                   ),
 
-                  // 3. ПОВНІСТЮ ВИМИКАЄМО ВИДІЛЕННЯ (при наведенні / натисканні не буде жодного сліду)
                   splashColor: Colors.transparent,
-                  //highlightColor: Colors.transparent,
-                  //hoverColor: Colors.transparent, // Прибирає виділення при наведенні курсора на вебі/десктопі
 
                   initiallyExpanded: true,
                   tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -415,7 +394,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     Icons.keyboard_arrow_down,
                     color: Color(0xFF191C1E),
                   ),
-                  // 4. Вміст, який показується при розгортанні
                   children: [
 
                     const CustomTextField(
@@ -476,7 +454,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
     );
   }
 
-  // Допоміжний метод для рядка введення з кнопкою Apply
   Widget _buildInputField({
     TextEditingController? controller,
     required String hintText,
@@ -486,12 +463,11 @@ class _ProfileScreenState extends State<ProfileScreen>{
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF), // Світло-сіра капсульна підкладка
+        color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          // Іконка олівця
           const Icon(
             Icons.edit_outlined,
             size: 18,
@@ -499,7 +475,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
           ),
           const SizedBox(width: 10),
 
-          // Поле введення тексту
           Expanded(
             child: TextField(
               controller: controller,
@@ -527,11 +502,10 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
           const SizedBox(width: 8),
 
-          // Капсульна кнопка Apply
           ElevatedButton(
             onPressed: onApply,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A2E40), // Темно-синій/майже чорний
+              backgroundColor: const Color(0xFF1A2E40),
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),

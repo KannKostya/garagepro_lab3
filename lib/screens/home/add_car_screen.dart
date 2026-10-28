@@ -102,17 +102,17 @@ class AddCarScreen extends StatelessWidget {
                     onTap: () {
                       MainScreen.of(context)?.setIndex(0);
                     },
-                    customBorder: const CircleBorder(), // Робить хвилю натискання круглою
+                    customBorder: const CircleBorder(),
                     child: Container(
-                      width: 44, // Розмір кнопки
+                      width: 44,
                       height: 44,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFECEEF1), // Світло-сірий фон кола
+                        color: Color(0xFFECEEF1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: Color(0xFF0F2439), // Темно-синій/чорний колір стрілки
+                        color: Color(0xFF0F2439),
                         size: 20,
                       ),
                     ),
@@ -280,7 +280,6 @@ class AddCarScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Заголовок секції з іконкою ID-картки
                   Row(
                     children: const [
                       Icon(
@@ -302,7 +301,6 @@ class AddCarScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // 2. Поле: Vehicle Make *
                   _buildFieldLabel('Vehicle Make *'),
                   const SizedBox(height: 4),
                   const CustomTextField(
@@ -327,7 +325,6 @@ class AddCarScreen extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Поле Year (фіксована ширина або менша частка)
                       SizedBox(
                         width: 110,
                         child: Column(
@@ -346,7 +343,6 @@ class AddCarScreen extends StatelessWidget {
 
                       const SizedBox(width: 12),
 
-                      // Поле Trim / Package (займає весь залишковий простір)
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -384,7 +380,6 @@ class AddCarScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Заголовок секції з іконкою ID-картки
                   Row(
                     children: const [
                       Icon(
@@ -406,7 +401,6 @@ class AddCarScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // 2. Поле: Vehicle Make *
                   _buildFieldLabel('License Plate / Tag'),
                   const SizedBox(height: 4),
                   const CustomTextField(
@@ -417,7 +411,6 @@ class AddCarScreen extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  // 3. Поле: Model *
                   _buildFieldLabel('VIN (Vehicle Identification Number)'),
                   const SizedBox(height: 4),
                   const CustomTextField(
@@ -477,50 +470,4 @@ class AddCarScreen extends StatelessWidget {
       ),
     );
   }
-
-  // Універсальне текстове поле у сірій підкладці
-  /*Widget _buildInputField({
-    required String hintText,
-    IconData? prefixIcon,
-    TextInputType? keyboardType,
-    TextEditingController? controller,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F4F6), // М'який сірий фон інпуту
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Color(0xFF0F2439),
-          fontWeight: FontWeight.w500,
-        ),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          isDense: true,
-          prefixIcon: prefixIcon != null
-              ? Icon(
-                  prefixIcon,
-                  size: 20,
-                  color: const Color(0xFF64748B),
-                )
-              : null,
-          prefixIconConstraints: const BoxConstraints(
-            minWidth: 40,
-            minHeight: 40,
-          ),
-          hintText: hintText,
-          hintStyle: const TextStyle(
-            fontSize: 14,
-            color: Color(0xFF64748B),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ),
-    );
-  }*/
 }

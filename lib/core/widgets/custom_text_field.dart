@@ -7,7 +7,6 @@ class CustomTextField extends StatefulWidget {
   final TextEditingController? controller;
   final Color bgColor;
   final TextInputType? keyboardType;
-  //final BorderRadius? borderRadius;
 
   const CustomTextField({
     super.key,
@@ -17,20 +16,17 @@ class CustomTextField extends StatefulWidget {
     this.isPassword = false,
     this.controller,
     this.bgColor = const Color(0xFFE0E3E6),
-    //this.borderRadius = const BorderRadius.circular(8),
   });
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
 class _CustomTextFieldState extends State<CustomTextField> {
-  // Локальна змінна для відстеження приховування тексту
   late bool _obscureText;
 
   @override
   void initState() {
     super.initState();
-    // Початкове значення береться з параметра віджета
     _obscureText = widget.isPassword;
   }
 
@@ -39,7 +35,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return TextField(
       controller: widget.controller,
       keyboardType: widget.keyboardType,
-      // Якщо це пароль — використовуємо поточний стан, інакше текст завжди відкритий
       obscureText: widget.isPassword ? _obscureText : false,
       decoration: InputDecoration(
         filled: true,
@@ -58,9 +53,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             color: const Color(0xFF64748B),
           )
         : null,
-
-        //prefixIcon: Icon(widget.prefixIcon, color: const Color(0xFF9CA3AF)),
-        // Якщо isPassword == true — показуємо кнопку-око, інакше суфікс порожній
+        
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(

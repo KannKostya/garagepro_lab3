@@ -12,7 +12,6 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class RegistrationScreenState extends State<RegistrationScreen>{
-  // Контролери для зчитування введеного тексту
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isChecked = false;
@@ -225,14 +224,14 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                                   _isChecked = value ?? false;
                                 });
                               },
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // Прибирає зайву невидиму зону 48x48
-                              visualDensity: VisualDensity.compact,                   // Додатково стискає відступи
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
                               activeColor: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2.5), // Закруглення кутиків квадрата
+                                borderRadius: BorderRadius.circular(2.5),
                               ),
                               side: BorderSide(
-                                color: Color(0xFF767676), // Колір рамки в неактивному стані
+                                color: Color(0xFF767676),
                                 width: 1,
                               ),
                             ),
@@ -280,7 +279,6 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                       bgColor: Color(0xFF03192A),
                       textColor: Color(0xFFFFFFFF),
                       onPressed: () {
-                        // Без бекенду: перехід одразу на головний екран
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -324,7 +322,6 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
               const SizedBox(height: 10),
 
-              // 2. Рядок із двома кнопками (Google та Apple)
               Row(
                 children: [
                   // Кнопка Google

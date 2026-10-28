@@ -5,14 +5,13 @@ import 'home/service_screen.dart';
 import 'profile/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  final int initialIndex; // Новий параметр зі значенням за замовчуванням
+  final int initialIndex;
 
   const MainScreen({
     super.key,
-    this.initialIndex = 0, // За замовчуванням відкривається перша вкладка (Garage)
+    this.initialIndex = 0,
   });
 
-  // Дозволяє дочірнім віджетам викликати MainScreen.of(context)
   static _MainScreenState? of(BuildContext context) {
     return context.findAncestorStateOfType<_MainScreenState>();
   }
@@ -24,7 +23,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   late int _currentIndex;
 
-  // Окремий ключ навігації суто для вкладки Garage
   final GlobalKey<NavigatorState>
   _garageNavigatorKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState>
@@ -38,13 +36,11 @@ class _MainScreenState extends State<MainScreen> {
     _currentIndex = widget.initialIndex;
   }
 
-  // МЕТОД ДЛЯ ПЕРЕХОДУ НА ВКЛАДКУ SERVICE З ВІДКРИТТЯМ КОНКРЕТНОГО ЕКРАНА
   void navigateToServiceWithScreen(Widget screen) {
     setState(() {
-      _currentIndex = 1; // 1 — індекс вкладки Service
+      _currentIndex = 1;
     });
 
-    // Після оновлення стану додаємо новий екран у стек навігатора Service
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _serviceNavigatorKey.currentState?.push(
         MaterialPageRoute(builder: (context) => screen),
@@ -54,10 +50,9 @@ class _MainScreenState extends State<MainScreen> {
   
   void navigateToGarageWithScreen(Widget screen) {
     setState(() {
-      _currentIndex = 0; // 0 — індекс вкладки Garage
+      _currentIndex = 0;
     });
 
-    // Після оновлення стану додаємо новий екран у стек навігатора Garage
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _garageNavigatorKey.currentState?.push(
         MaterialPageRoute(builder: (context) => screen),
@@ -68,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
   void setIndex(int index) {
     setState(() {
       _currentIndex = index;
-      _isOpenedFromButton = true; // З нижньої панелі стрілку скидаємо
+      _isOpenedFromButton = true;
     });
   }
 
@@ -77,19 +72,14 @@ class _MainScreenState extends State<MainScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, resutl) async{
-        // 2. Обробка повернення назад залежно від того, яка вкладка активна
         if (_currentIndex == 0 &&
             _garageNavigatorKey.currentState != null &&
             _garageNavigatorKey.currentState!.canPop()) {
-          // Якщо в Garage є попередній екран — повертаємося всередині Garage
           _garageNavigatorKey.currentState!.pop();
         } else if (_currentIndex == 1 &&
             _serviceNavigatorKey.currentState != null &&
             _serviceNavigatorKey.currentState!.canPop()) {
-          // Якщо в Service є попередній екран — повертаємося всередині Service
           _serviceNavigatorKey.currentState!.pop();
-        } else if (_currentIndex != 0) {
-          // Якщо ми на будь-якій іншій вкладці і стек чистий — повертаємося на першу (Garage)
           setState(() {
             _currentIndex = 0;
           });
@@ -177,7 +167,6 @@ class _MainScreenState extends State<MainScreen> {
     return GestureDetector(
       onTap: () {
         if (index == 1) {
-          // Скидаємо всі дочірні екрани сервісу назад до кореневого (ServiceHomeScreen)
           _serviceNavigatorKey.currentState?.popUntil((route) => route.isFirst);
         }
 
