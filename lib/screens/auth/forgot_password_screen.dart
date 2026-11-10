@@ -1,10 +1,71 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/custom_text_field.dart';
+//import '../../core/widgets/custom_button.dart';
+import '../../core/widgets/custom_input_decoration.dart';
 import '../auth/login_screen.dart';
+import '../../repositories/auth_repository.dart';
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final AuthRepository _authRepository = AuthRepository();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  bool _isSuccessSent = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleResetPassword() async {
+    // 1. Перевірка валідності email
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _isSuccessSent = false;
+    });
+
+    try {
+      // 2. Виклик методу скидання пароля
+      await _authRepository.resetPassword(
+        email: _emailController.text.trim(),
+      );
+
+      setState(() {
+        _isSuccessSent = true;
+      });
+
+      if (mounted) {
+        /*ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('The instr!'),
+            backgroundColor: Colors.green,
+          ),
+        );*/
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +115,12 @@ class ForgotPasswordScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+          child: Form(
+            key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-
+              
               const SizedBox(height: 130),
 
               Image.asset(
@@ -112,6 +175,39 @@ class ForgotPasswordScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
+                    if (_errorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade800, fontSize: 13),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // Повідомлення про успішне надсилання
+                    if (_isSuccessSent) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green.shade200),
+                        ),
+                        child: Text(
+                          'The message is succesfully delivered. Check your inbox.',
+                          style: TextStyle(color: Colors.green.shade900, fontSize: 13),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -137,9 +233,25 @@ class ForgotPasswordScreen extends StatelessWidget {
 
                     const SizedBox(height: 6),
 
-                    const CustomTextField(
-                      label: 'example@driver.com',
-                      prefixIcon: Icons.email_outlined,
+                    // Поле введення email
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(fontSize: 15, color: Color(0xFF0F2439)),
+                      decoration: EnterInputDecorations.standard(
+                        hintText: "example@driver.com",
+                        icon: Icons.email_outlined,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Enter eMail';
+                        }
+                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (!emailRegex.hasMatch(value.trim())) {
+                          return 'Unsupported eMail format';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 6),
@@ -166,7 +278,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    CustomButton(
+                    /*CustomButton(
                       text: 'Send Reset Link',
                       icon: Icons.arrow_forward,
                       bgColor: Color(0xFF03192A),
@@ -177,6 +289,45 @@ class ForgotPasswordScreen extends StatelessWidget {
                         );
                         Navigator.pop(context);
                       },
+                    ),*/
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _handleResetPassword,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                        backgroundColor: const Color(0xFF03192A),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.2,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+                              
+                                Text(
+                                  'Set Reset Link',
+                                  style: TextStyle(color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal),
+                                ),
+
+                                SizedBox(width: 8,),
+                                
+                                Icon(Icons.arrow_forward,
+                                color: Colors.white,),
+                                
+                              ],
+                            )
                     ),
                   ],
                 ),
@@ -270,6 +421,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 ],
               ),
             ],
+          ),
           ),
         ),
       ),

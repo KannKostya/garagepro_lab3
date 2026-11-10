@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "488928689703",
+    "project_id": "garage-pro-45972",
+    "storage_bucket": "garage-pro-45972.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488928689703:android:a501a3fe7d68cd890fd802",
+        "android_client_info": {
+          "package_name": "com.example.garagepro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488928689703-stustgteg2b2s5j50tuqmnh8dm3rs47r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.garagepro",
+            "certificate_hash": "71f51f1e9e0017b10965b8e94b9bcb24010cae6f"
+          }
+        },
+        {
+          "client_id": "488928689703-pq2f7tgip4tfhefgctkoi7i91d12bukk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfiZv5P23keZwMVGgimTd25MRCclq1jis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488928689703-pq2f7tgip4tfhefgctkoi7i91d12bukk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

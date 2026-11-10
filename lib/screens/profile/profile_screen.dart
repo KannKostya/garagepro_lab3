@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/custom_text_field.dart';
-import '../auth/login_screen.dart';
 import '../main_screen.dart';
 import '../home/garage_screen.dart';
+import '../../repositories/auth_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../screens/auth/auth_gate.dart';
+import '../../core/widgets/custom_input_decoration.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBackButton;
@@ -18,6 +19,105 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen>{
+  final AuthRepository authRepo = AuthRepository();
+
+  // Окремі ключі валідації для кожної секції
+  final _nameFormKey = GlobalKey<FormState>();
+  final _passwordFormKey = GlobalKey<FormState>();
+
+  late final TextEditingController _nameController;
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+
+  bool _isNameLoading = false;
+  bool _isPasswordLoading = false;
+  bool _obscureCurrentPassword = true;
+  bool _obscureNewPassword = true;
+
+  String? _currentPasswordError;
+
+  @override
+  void initState() {
+    super.initState();
+    // Ініціалізуємо поле імені поточним значенням
+    final currentUser = FirebaseAuth.instance.currentUser;
+    _nameController = TextEditingController(text: currentUser?.displayName ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updateName() async {
+    if (!_nameFormKey.currentState!.validate()) return;
+
+    setState(() => _isNameLoading = true);
+    try {
+      await authRepo.updateDisplayName(_nameController.text.trim());
+      if (mounted) {
+        FocusScope.of(context).unfocus(); // Приховуємо клавіатуру
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Name succesfully changed!"),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isNameLoading = false);
+    }
+  }
+
+  Future<void> _updatePassword() async {
+    if (!_passwordFormKey.currentState!.validate()) return;
+
+    setState(() => _isPasswordLoading = true);
+    try {
+      final bool isCorrect = await authRepo.verifyCurrentPassword(
+        _currentPasswordController.text.trim(),
+      );
+
+      if (!isCorrect) {
+        if (mounted) {
+          setState(() {
+            _currentPasswordError = 'Incorrect password';
+          });
+          _passwordFormKey.currentState!.validate();
+        }
+        return;
+      }
+
+      await authRepo.updatePassword(_newPasswordController.text.trim());
+      if (mounted) {
+        _currentPasswordController.clear();
+        _newPasswordController.clear();
+        FocusScope.of(context).unfocus();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password succesfully changed!'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isPasswordLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +193,21 @@ class _ProfileScreenState extends State<ProfileScreen>{
 				),
       ),
 
-      body: SingleChildScrollView(
+      body: StreamBuilder<User?>(
+        stream: authRepo.authStateChanges,
+        builder: (context, snapshot) {
+          final user = snapshot.data ?? authRepo.currentUser;
+
+          if (user == null) {
+            return const Center(child: Text('User is not authorised'));
+          }
+
+          final String displayName = user.displayName?.trim().isNotEmpty == true
+              ? user.displayName!
+              : 'GaragePro User';
+          final String email = user.email ?? 'Unknown eMail';
+
+          return SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -153,8 +267,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
               ),
             ),
 
-            const Text(
-              'Kostiantyn Kann',
+            Text(
+              displayName,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -162,8 +276,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
               ),
             ),
 
-            const Text(
-              'example@driver.com',
+            Text(
+              email,
               style: TextStyle(
                 fontSize: 12,
                 color: Color(0xFF43474C),
@@ -278,7 +392,11 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                 ),
-                child: ExpansionTile(
+                child: 
+                Form(
+                  key: _nameFormKey,
+                  child:
+                ExpansionTile(
                   backgroundColor: Color(0xFFF2F4F7),
                   collapsedBackgroundColor: Color(0xFFF2F4F7),
 
@@ -314,26 +432,73 @@ class _ProfileScreenState extends State<ProfileScreen>{
                     Icons.keyboard_arrow_down,
                     color: Color(0xFF191C1E),
                   ),
+
                   children: [
-                    _buildInputField(
-                      hintText: 'Change name...',
-                      onApply: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Name succesfully changed!')),
-                        );
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: ChangeInputDecorations.standard(
+                        hintText: 'Change name...',
+                        icon: Icons.edit_outlined,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Required field';
+                        }
+                        return null;
                       },
                     ),
+
                     const SizedBox(height: 16),
-                    _buildInputField(
-                      hintText: 'Change eMail...',
-                      keyboardType: TextInputType.emailAddress,
-                      onApply: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('eMail succesfully changed!')),
-                        );
-                      },
+
+                    ElevatedButton(
+                        onPressed: _isNameLoading ? null : _updateName,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: const Color(0xFF03192A),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      child: _isNameLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                          )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+
+                                Icon(Icons.check_circle_outline,
+                                color: Colors.white,),
+
+                                SizedBox(width: 8,),
+
+                                Text(
+                                  'Apply Changes',
+                                  style: TextStyle(color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal),
+                                ),
+                              ],
+                            )
                     ),
+
+
+                    /*ListTile(
+                      onTap: () => _confirmSignOut(context),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      tileColor: const Color(0xFFF1F4F6),
+                      leading: const Icon(Icons.edit_outlined, color: Color(0xFF0F2439)),
+                      title: const Text("Змінити ім'я", style: TextStyle(fontWeight: FontWeight.w600)),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Color(0xFF94A3B8)),
+                    ),*/
+
                   ],
+                ),
+
                 ),
               ),
             ),
@@ -358,7 +523,10 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                 ),
-                child: ExpansionTile(
+                child: Form(
+                  key: _passwordFormKey,
+                  child:
+                  ExpansionTile(
                   backgroundColor: Color(0xFFF2F4F7),
                   collapsedBackgroundColor: Color(0xFFF2F4F7),
 
@@ -396,25 +564,75 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   ),
                   children: [
 
-                    const CustomTextField(
-                      label: 'Enter old password...',
-                      prefixIcon: Icons.lock_reset,
-                      isPassword: true,
-                      bgColor: Colors.white,
+                    TextFormField(
+                      controller: _currentPasswordController,
+                      obscureText: _obscureCurrentPassword,
+                      textInputAction: TextInputAction.done,
+                      decoration: ChangeInputDecorations.standard(
+                        hintText: 'Enter current password...',
+                        icon: Icons.lock_reset,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureCurrentPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                            color: const Color(0xFF64748B),
+                            size: 20,
+                          ),
+                          onPressed: () => setState(() => _obscureCurrentPassword = !_obscureCurrentPassword),
+                        ),
+                      ),
+                      onChanged: (value){
+                        if (_currentPasswordError != null) {
+                          setState(() {
+                            _currentPasswordError = null;
+                          });
+                        }
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter password';
+                        }
+                        if (value.length < 8) {
+                          return 'Password should be at least 8 symbols';
+                        }
+                        if (_currentPasswordError != null){
+                          return _currentPasswordError;
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                    
+                    TextFormField(
+                      controller: _newPasswordController,
+                      obscureText: _obscureNewPassword,
+                      textInputAction: TextInputAction.done,
+                      decoration: ChangeInputDecorations.standard(
+                        hintText: 'Enter new password...',
+                        icon: Icons.lock_reset,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                            color: const Color(0xFF64748B),
+                            size: 20,
+                          ),
+                          onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter new password';
+                        }
+                        if (value.length < 8) {
+                          return 'Password should be at least 8 symbols';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 16),
 
-                    const CustomTextField(
-                      label: 'Enter new password...',
-                      prefixIcon: Icons.lock_reset,
-                      isPassword: true,
-                      bgColor: Colors.white,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    CustomButton(
+                    /*CustomButton(
                       text: 'Change Password',
                       bgColor: Color(0xFF03192A),
                       textColor: Color(0xFFFFFFFF),
@@ -425,14 +643,75 @@ class _ProfileScreenState extends State<ProfileScreen>{
                           const SnackBar(content: Text('Password succesfully changed!')),
                         );
                       },
+                    ),*/
+
+                    ElevatedButton(
+                        onPressed: _isPasswordLoading ? null : _updatePassword,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: const Color(0xFF03192A),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      child: _isNameLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                          )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+
+                                Icon(Icons.check_circle_outline,
+                                color: Colors.white,),
+
+                                SizedBox(width: 8,),
+
+                                Text(
+                                  'Change Password',
+                                  style: TextStyle(color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal),
+                                ),
+                              ],
+                            )
                     ),
                   ],
+                ),
                 ),
               ),
             ),
             const SizedBox(height: 24),
             
-            CustomButton(
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: () => _confirmSignOut(context),
+                icon: const Icon(Icons.logout_rounded, color: Color(0xFFEF4444), size: 20),
+                label: const Text(
+                  'Log Out',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFEF4444),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFEE2E2), // М'який світло-червоний фон
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+
+            /*CustomButton(
               text: 'Log out',
               isOutlined: false,
               icon: Icons.logout,
@@ -447,84 +726,63 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   (route) => false,
                 );
               },
-            ),
+            ),*/
           ],
         ),
-      ),
+          );
+        },
+    ),
     );
   }
 
-  Widget _buildInputField({
-    TextEditingController? controller,
-    required String hintText,
-    required VoidCallback onApply,
-    TextInputType? keyboardType,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.edit_outlined,
-            size: 18,
-            color: Color(0xFF64748B),
-          ),
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: TextField(
-              controller: controller,
-              keyboardType: keyboardType,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF0F2439),
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                filled: false,
-                fillColor: Colors.transparent,
-                hintText: hintText,
-                hintStyle: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF64748B),
-                  fontWeight: FontWeight.w400,
-                ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-              ),
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final bool? shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text(
+            'Logging Out',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F2439),
             ),
           ),
-
-          const SizedBox(width: 8),
-
-          ElevatedButton(
-            onPressed: onApply,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A2E40),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: const Text(
-              'Apply',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
+          content: const Text(
+            'Are you sure you want to Log Out?',
+            style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('No', style: TextStyle(color: Color(0xFF64748B))),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEF4444), // Червоний колір для деструктивної дії
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Yes', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
+
+    if (shouldLogout == true) {
+      await AuthRepository().signOut();
+
+      // Очищаємо всі відкриті екрани та скидаємо стек до кореня
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthGate()), 
+          // або прямо на SignInScreen() / LoginScreen()
+          (route) => false,
+        );
+      }
+    }
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/custom_text_field.dart';
+import '../../core/widgets/custom_input_decoration.dart';
 import '../auth/login_screen.dart';
-import '../main_screen.dart';
+import '../../repositories/auth_repository.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -11,17 +10,97 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => RegistrationScreenState();
 }
 
-class RegistrationScreenState extends State<RegistrationScreen>{
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class RegistrationScreenState extends State<RegistrationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  
+  final AuthRepository _authRepository = AuthRepository();
+
   bool _isChecked = false;
+  // Стан видимості паролів
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  bool _isLoading = false;
+  //bool _isGoogleLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
+
+  // Обробник натискання кнопки реєстрації
+  Future<void> _handleRegister() async {
+    // 1. Локальна валідація форми
+    if (!_formKey.currentState!.validate()) return;
+
+    // 2. Встановлення стану завантаження та очищення попередніх помилок
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // 3. Виклик бізнес-логіки з репозиторію
+      await _authRepository.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        displayName: _nameController.text.trim(),
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Обліковий запис успішно створено!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context); // Повернення на екран логіну або авто-вхід через AuthGate
+      }
+    } catch (error) {
+      // 4. Відображення серверної помилки (вже зайнятий email тощо)
+      setState(() {
+        _errorMessage = error.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  /*Future<void> _handleGoogleSignIn() async {
+    setState(() => _isGoogleLoading = true);
+    try {
+      final userCredential = await AuthRepository().signInWithGoogle();
+      if (userCredential != null && mounted) {
+        // Якщо вхід успішний, закриваємо екран (якщо він відкривався через Navigator.push)
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleLoading = false);
+      }
+    }
+  }*/
 
   @override
   Widget build(BuildContext context){
@@ -71,6 +150,8 @@ class RegistrationScreenState extends State<RegistrationScreen>{
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Form(
+            key: _formKey,
           child: Column(
             children: [
 
@@ -119,7 +200,23 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-
+                    
+                    if (_errorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade800, fontSize: 13),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                      
                     const Text(
                       'Full Name',
                       style: TextStyle(
@@ -131,9 +228,20 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
                     const SizedBox(height: 6),
 
-                    const CustomTextField(
-                      label: 'e.g. Kostiantyn Kann',
-                      prefixIcon: Icons.person_outline,
+                    // Поле імені
+                    TextFormField(
+                      controller: _nameController,
+                      textInputAction: TextInputAction.next,
+                      decoration: EnterInputDecorations.standard(
+                        hintText: "e. g. Kostiantyn Kann",
+                        icon: Icons.person_outline_rounded,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Enter name";
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -149,10 +257,31 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
                     const SizedBox(height: 6),
 
-                    const CustomTextField(
+                    // Поле Email
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      decoration: EnterInputDecorations.standard(
+                        hintText: 'example@driver.com',
+                        icon: Icons.email_outlined,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Enter eMail';
+                        }
+                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (!emailRegex.hasMatch(value.trim())) {
+                          return 'Unsupported eMail format';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    /*const CustomTextField(
                       label: 'example@driver.com',
                       prefixIcon: Icons.email_outlined,
-                    ),
+                    ),*/
 
                     const SizedBox(height: 16),
 
@@ -182,10 +311,31 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
                     const SizedBox(height: 6),
 
-                    const CustomTextField(
-                      label: '••••••••••••',
-                      prefixIcon: Icons.lock_outline,
-                      isPassword: true,
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      textInputAction: TextInputAction.next,
+                      decoration: EnterInputDecorations.standard(
+                        hintText: '••••••••••••••••',
+                        icon: Icons.lock_outline_rounded,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                            color: const Color(0xFF64748B),
+                            size: 20,
+                          ),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter password';
+                        }
+                        if (value.length < 8) {
+                          return 'Password should be at least 8 symbols';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -201,10 +351,31 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
                     const SizedBox(height: 6),
 
-                    const CustomTextField(
-                      label: '••••••••••••',
-                      prefixIcon: Icons.lock_outline,
-                      isPassword: true,
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      textInputAction: TextInputAction.done,
+                      decoration: EnterInputDecorations.standard(
+                        hintText: '••••••••••••••••',
+                        icon: Icons.lock_outline_rounded,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                            color: const Color(0xFF64748B),
+                            size: 20,
+                          ),
+                          onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Repeat password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords dont match';
+                        }
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -273,7 +444,7 @@ class RegistrationScreenState extends State<RegistrationScreen>{
 
                     const SizedBox(height: 16),
 
-                    CustomButton(
+                    /*CustomButton(
                       text: 'Create Account',
                       icon: Icons.arrow_forward,
                       bgColor: Color(0xFF03192A),
@@ -284,133 +455,53 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                           MaterialPageRoute(builder: (_) => const MainScreen()),
                         );
                       },
+                    ),*/
+
+                    // Кнопка реєстрації на всю ширину із індикатором
+                    ElevatedButton(
+                        onPressed: _isLoading ? null : _handleRegister,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                          backgroundColor: const Color(0xFF03192A),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.2,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+
+                              children: [
+                              
+                                Text(
+                                  'Create account',
+                                  style: TextStyle(color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal),
+                                ),
+
+                                SizedBox(width: 8,),
+                                
+                                Icon(Icons.arrow_forward,
+                                color: Colors.white,),
+                                
+                              ],
+                            )
                     ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 10),
-              
-              Row(
-                children: [
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      'OR SIGN UP WITH',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey.shade500,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 1,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              Row(
-                children: [
-                  // Кнопка Google
-                  Expanded(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const MainScreen()),
-                          );
-                        },
-                        child: Container(
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset('assets/images/chrome.png'),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Google',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  // Кнопка Apple
-                  Expanded(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const MainScreen()),
-                          );
-                        },
-                        child: Container(
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.apple,
-                                size: 24,
-                                color: Colors.black,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Apple',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -443,6 +534,7 @@ class RegistrationScreenState extends State<RegistrationScreen>{
                 ],
               )
             ],
+          ),
           )
         ),
       ),
