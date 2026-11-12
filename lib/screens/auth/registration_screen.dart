@@ -20,12 +20,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
   final AuthRepository _authRepository = AuthRepository();
 
   bool _isChecked = false;
-  // Стан видимості паролів
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   bool _isLoading = false;
-  //bool _isGoogleLoading = false;
+  bool _isSubmitted = false;
   String? _errorMessage;
 
   @override
@@ -37,19 +36,17 @@ class RegistrationScreenState extends State<RegistrationScreen> {
     super.dispose();
   }
 
-  // Обробник натискання кнопки реєстрації
   Future<void> _handleRegister() async {
-    // 1. Локальна валідація форми
+    setState(() => _isSubmitted = true);
+
     if (!_formKey.currentState!.validate()) return;
 
-    // 2. Встановлення стану завантаження та очищення попередніх помилок
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      // 3. Виклик бізнес-логіки з репозиторію
       await _authRepository.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -57,16 +54,9 @@ class RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Обліковий запис успішно створено!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context); // Повернення на екран логіну або авто-вхід через AuthGate
+        Navigator.pop(context);
       }
     } catch (error) {
-      // 4. Відображення серверної помилки (вже зайнятий email тощо)
       setState(() {
         _errorMessage = error.toString();
       });
@@ -78,29 +68,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
       }
     }
   }
-
-  /*Future<void> _handleGoogleSignIn() async {
-    setState(() => _isGoogleLoading = true);
-    try {
-      final userCredential = await AuthRepository().signInWithGoogle();
-      if (userCredential != null && mounted) {
-        // Якщо вхід успішний, закриваємо екран (якщо він відкривався через Navigator.push)
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isGoogleLoading = false);
-      }
-    }
-  }*/
 
   @override
   Widget build(BuildContext context){
@@ -152,6 +119,8 @@ class RegistrationScreenState extends State<RegistrationScreen> {
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Form(
             key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            
           child: Column(
             children: [
 
@@ -228,7 +197,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
 
                     const SizedBox(height: 6),
 
-                    // Поле імені
                     TextFormField(
                       controller: _nameController,
                       textInputAction: TextInputAction.next,
@@ -236,7 +204,13 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                         hintText: "e. g. Kostiantyn Kann",
                         icon: Icons.person_outline_rounded,
                       ),
+                      onChanged: (text) {
+                        if (_isSubmitted) {
+                          setState(() => _isSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isSubmitted) return null;
                         if (value == null || value.trim().isEmpty) {
                           return "Enter name";
                         }
@@ -257,7 +231,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
 
                     const SizedBox(height: 6),
 
-                    // Поле Email
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -266,7 +239,13 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                         hintText: 'example@driver.com',
                         icon: Icons.email_outlined,
                       ),
+                      onChanged: (text) {
+                        if (_isSubmitted) {
+                          setState(() => _isSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isSubmitted) return null;
                         if (value == null || value.trim().isEmpty) {
                           return 'Enter eMail';
                         }
@@ -277,12 +256,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                         return null;
                       },
                     ),
-
-                    /*const CustomTextField(
-                      label: 'example@driver.com',
-                      prefixIcon: Icons.email_outlined,
-                    ),*/
-
+                    
                     const SizedBox(height: 16),
 
                     Row(
@@ -327,7 +301,13 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
                       ),
+                      onChanged: (text) {
+                        if (_isSubmitted) {
+                          setState(() => _isSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isSubmitted) return null;
                         if (value == null || value.isEmpty) {
                           return 'Enter password';
                         }
@@ -367,7 +347,13 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                           onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                         ),
                       ),
+                      onChanged: (text) {
+                        if (_isSubmitted) {
+                          setState(() => _isSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isSubmitted) return null;
                         if (value == null || value.isEmpty) {
                           return 'Repeat password';
                         }
@@ -444,20 +430,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
 
                     const SizedBox(height: 16),
 
-                    /*CustomButton(
-                      text: 'Create Account',
-                      icon: Icons.arrow_forward,
-                      bgColor: Color(0xFF03192A),
-                      textColor: Color(0xFFFFFFFF),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const MainScreen()),
-                        );
-                      },
-                    ),*/
-
-                    // Кнопка реєстрації на всю ширину із індикатором
                     ElevatedButton(
                         onPressed: _isLoading ? null : _handleRegister,
                         style: ElevatedButton.styleFrom(

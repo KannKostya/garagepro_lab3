@@ -33,13 +33,14 @@ class _ProfileScreenState extends State<ProfileScreen>{
   bool _isPasswordLoading = false;
   bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
+  bool _isNameSubmitted = false;
+  bool _isPasswordSubmitted = false;
 
   String? _currentPasswordError;
 
   @override
   void initState() {
     super.initState();
-    // Ініціалізуємо поле імені поточним значенням
     final currentUser = FirebaseAuth.instance.currentUser;
     _nameController = TextEditingController(text: currentUser?.displayName ?? '');
   }
@@ -53,13 +54,15 @@ class _ProfileScreenState extends State<ProfileScreen>{
   }
 
   Future<void> _updateName() async {
+    setState(() => _isNameSubmitted = true);
+
     if (!_nameFormKey.currentState!.validate()) return;
 
     setState(() => _isNameLoading = true);
     try {
       await authRepo.updateDisplayName(_nameController.text.trim());
       if (mounted) {
-        FocusScope.of(context).unfocus(); // Приховуємо клавіатуру
+        FocusScope.of(context).unfocus();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Name succesfully changed!"),
@@ -78,6 +81,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
   }
 
   Future<void> _updatePassword() async {
+    setState(() => _isPasswordSubmitted = true);
+
     if (!_passwordFormKey.currentState!.validate()) return;
 
     setState(() => _isPasswordLoading = true);
@@ -106,6 +111,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
             content: Text('Password succesfully changed!'),
           ),
         );
+        _isPasswordSubmitted = false;
+        _passwordFormKey.currentState!.validate();
       }
     } catch (e) {
       if (mounted) {
@@ -395,6 +402,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 child: 
                 Form(
                   key: _nameFormKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+
                   child:
                 ExpansionTile(
                   backgroundColor: Color(0xFFF2F4F7),
@@ -440,9 +449,15 @@ class _ProfileScreenState extends State<ProfileScreen>{
                         hintText: 'Change name...',
                         icon: Icons.edit_outlined,
                       ),
+                      onChanged: (text) {
+                        if (_isNameSubmitted) {
+                          setState(() => _isNameSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isNameSubmitted) return null;
                         if (value == null || value.trim().isEmpty) {
-                          return 'Required field';
+                          return 'The name cannot be empty';
                         }
                         return null;
                       },
@@ -525,6 +540,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 ),
                 child: Form(
                   key: _passwordFormKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+
                   child:
                   ExpansionTile(
                   backgroundColor: Color(0xFFF2F4F7),
@@ -586,8 +603,12 @@ class _ProfileScreenState extends State<ProfileScreen>{
                             _currentPasswordError = null;
                           });
                         }
+                        if (_isPasswordSubmitted) {
+                          setState(() => _isPasswordSubmitted = false);
+                        }
                       },
                       validator: (value) {
+                        if (!_isPasswordSubmitted) return null;
                         if (value == null || value.isEmpty) {
                           return 'Enter password';
                         }
@@ -619,7 +640,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
                           onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
                         ),
                       ),
+                      onChanged: (text) {
+                        if (_isPasswordSubmitted) {
+                          setState(() => _isPasswordSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isPasswordSubmitted) return null;
                         if (value == null || value.isEmpty) {
                           return 'Enter new password';
                         }

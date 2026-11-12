@@ -1,43 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Стрім стану автентифікації для реактивного перемикання екранів
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
-
-  // Вхід та автоматична реєстрація через Google
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      // 1. Запуск вікна вибору акаунта Google на пристрої
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      // Якщо користувач скасував вибір (натиснув "Назад")
-      if (googleUser == null) {
-        return null;
-      }
-
-      // 2. Отримання деталей автентифікації від Google
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      // 3. Створення облікових даних для Firebase
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // 4. Вхід у Firebase з отриманими обліковими даними
-      return await _auth.signInWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw 'Помилка авторизації через Google: $e';
-    }
-  }
   
   // Реєстрація нового користувача з ім'ям
   Future<UserCredential> signUp({
@@ -99,7 +68,7 @@ class AuthRepository {
     }
   }
 
-  // Оновлення профілю (ім'я та фото з HTTPS-посилання)
+  // Оновлення профілю
   Future<void> updateProfile({String? displayName, String? photoUrl}) async {
     try {
       if (displayName != null) {
@@ -116,7 +85,6 @@ class AuthRepository {
 
   // Вихід із системи
   Future<void> signOut() async {
-    //await _googleSignIn.signOut();
     await _auth.signOut();
   }
 
@@ -138,13 +106,14 @@ class AuthRepository {
         return e.message ?? 'Authentification error occured.';
     }
   }
+  
   // Оновлення імені користувача
   Future<void> updateDisplayName(String newName) async {
     try {
       final user = _auth.currentUser;
       if (user != null) {
         await user.updateDisplayName(newName);
-        await user.reload(); // Оновлює дані локального об'єкта User
+        await user.reload();
       }
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -159,18 +128,16 @@ class AuthRepository {
         throw 'The user is not authorised';
       }
 
-      // Створюємо облікові дані на основі email користувача та введеного пароля
       final AuthCredential credential = EmailAuthProvider.credential(
         email: user.email!,
         password: currentPassword,
       );
 
-      // Спроба повторної автентифікації
       await user.reauthenticateWithCredential(credential);
-      return true; // Пароль правильний
+      return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-        return false; // Неправильний пароль
+        return false;
       }
       throw _handleAuthException(e);
     } catch (e) {

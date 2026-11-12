@@ -18,6 +18,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isSubmitted = false;
   bool _isSuccessSent = false;
 
   @override
@@ -27,7 +28,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _handleResetPassword() async {
-    // 1. Перевірка валідності email
+    setState(() => _isSubmitted = true);
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -117,6 +119,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
           child: Form(
             key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -242,7 +246,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         hintText: "example@driver.com",
                         icon: Icons.email_outlined,
                       ),
+                      onChanged: (text) {
+                        if (_isSubmitted) {
+                          setState(() => _isSubmitted = false);
+                        }
+                      },
                       validator: (value) {
+                        if (!_isSubmitted) return null;
                         if (value == null || value.trim().isEmpty) {
                           return 'Enter eMail';
                         }

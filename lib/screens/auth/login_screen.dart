@@ -3,7 +3,6 @@ import '../../core/widgets/custom_input_decoration.dart';
 import 'forgot_password_screen.dart';
 import 'registration_screen.dart';
 import '../../repositories/auth_repository.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,8 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _isSubmitted = false;
   String? _errorMessage;
-  
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -31,6 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
+    setState(() => _isSubmitted = true);
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -107,6 +109,8 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
           child: Form(
             key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -188,7 +192,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           hintText: "example@driver.com",
                           icon: Icons.email_outlined,
                         ),
+                        onChanged: (text) {
+                          if (_isSubmitted) {
+                            setState(() => _isSubmitted = false);
+                          }
+                        },
                         validator: (value) {
+                          if(!_isSubmitted) return null;
                           if (value == null || value.trim().isEmpty) {
                             return 'Enter eMail';
                           }
@@ -228,7 +238,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                         ),
+                        onChanged: (text) {
+                          if (_isSubmitted) {
+                            setState(() => _isSubmitted = false);
+                          }
+                        },
                         validator: (value) {
+                          if (!_isSubmitted) return null;
                           if (value == null || value.isEmpty) {
                             return 'Enter password';
                           }
@@ -330,19 +346,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               ],
                             )
                       ),
-
-                      /*CustomButton(
-                        text: 'Sign In',
-                        icon: Icons.arrow_forward,
-                        bgColor: Color(0xFF03192A),
-                        textColor: Color(0xFFFFFFFF),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const MainScreen()),
-                          );
-                        },
-                      ),*/
                     ],
                   ),
                 ),
