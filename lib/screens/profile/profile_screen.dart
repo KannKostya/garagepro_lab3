@@ -38,11 +38,25 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   String? _currentPasswordError;
 
+  static const List<String> _presetAvatars = [
+    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=256&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=256&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=256&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&auto=format&fit=crop&q=80',
+  ];
+  
+  late final TextEditingController _photoUrlController;
+
+  String? _currentPhotoUrl; // Збережене фото в профілі
+
   @override
   void initState() {
     super.initState();
     final currentUser = FirebaseAuth.instance.currentUser;
     _nameController = TextEditingController(text: currentUser?.displayName ?? '');
+    _currentPhotoUrl = currentUser?.photoURL;
+    _photoUrlController = TextEditingController(text: currentUser?.photoURL ?? '');
   }
 
   @override
@@ -50,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
     _nameController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
+    _photoUrlController.dispose();
     super.dispose();
   }
 
@@ -201,7 +216,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
       ),
 
       body: StreamBuilder<User?>(
-        stream: authRepo.authStateChanges,
+        stream: FirebaseAuth.instance.userChanges(),
+        initialData: FirebaseAuth.instance.currentUser,
         builder: (context, snapshot) {
           final user = snapshot.data ?? authRepo.currentUser;
 
@@ -213,6 +229,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
               ? user.displayName!
               : 'GaragePro User';
           final String email = user.email ?? 'Unknown eMail';
+
+          final photoUrl = user.photoURL;
 
           return SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -267,12 +285,30 @@ class _ProfileScreenState extends State<ProfileScreen>{
             const SizedBox(height: 24),
 
             Center(
-              child: Image.asset(
-                'assets/images/profileTop.png',
-                height: 136,
-                width: 135,
+            child: GestureDetector(
+              onTap: () => _showChangePhotoSheet(photoUrl),
+              child: CircleAvatar(
+                radius: 48,
+                backgroundColor: const Color(0xFFE2EAF4),
+                child: (photoUrl != null && photoUrl.startsWith('https://'))
+                    ? ClipOval(
+                        child: Image.network(
+                          photoUrl,
+                          key: ValueKey(photoUrl), // Примусово перемальовує при зміні URL
+                          width: 96,
+                          height: 96,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.person,
+                            size: 48,
+                            color: Color(0xFF0F2439),
+                          ),
+                        ),
+                      )
+                    : const Icon(Icons.person, size: 48, color: Color(0xFF0F2439)),
               ),
             ),
+          ),
 
             Text(
               displayName,
@@ -659,19 +695,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
                     const SizedBox(height: 16),
 
-                    /*CustomButton(
-                      text: 'Change Password',
-                      bgColor: Color(0xFF03192A),
-                      textColor: Color(0xFFFFFFFF),
-                      icon: Icons.check_circle_outline,
-                      isIconOnEnd: false,
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Password succesfully changed!')),
-                        );
-                      },
-                    ),*/
-
                     ElevatedButton(
                         onPressed: _isPasswordLoading ? null : _updatePassword,
                         style: ElevatedButton.styleFrom(
@@ -737,23 +760,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 ),
               ),
             ),
-
-            /*CustomButton(
-              text: 'Log out',
-              isOutlined: false,
-              icon: Icons.logout,
-              isIconOnEnd: false,
-              bgColor: Color(0xFFFFDAD6),
-              textColor: Color(0xFF93000A),
-
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              },
-            ),*/
           ],
         ),
           );
@@ -802,14 +808,278 @@ class _ProfileScreenState extends State<ProfileScreen>{
     if (shouldLogout == true) {
       await AuthRepository().signOut();
 
-      // Очищаємо всі відкриті екрани та скидаємо стек до кореня
       if (context.mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const AuthGate()), 
-          // або прямо на SignInScreen() / LoginScreen()
+          
           (route) => false,
         );
       }
     }
+  }
+
+  void _showChangePhotoSheet(String? currentPhotoUrl) {
+    final formKey = GlobalKey<FormState>();
+    final urlController = TextEditingController(text: currentPhotoUrl ?? '');
+    String? previewUrl = currentPhotoUrl;
+    bool isSaving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setSheetState) {
+            Future<void> handleSave() async {
+              if (!formKey.currentState!.validate()) return;
+
+              final newUrl = urlController.text.trim();
+              setSheetState(() => isSaving = true);
+
+              try {
+                // Після reload() StreamBuilder миттєво оновить аватар на сторінці
+                await authRepo.updatePhotoUrl(newUrl);
+
+                if (sheetContext.mounted) {
+                  Navigator.pop(sheetContext);
+                }
+                if (mounted) {
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile photo is succesfully changed!'),
+                    ),
+                  );
+                }
+              } catch (e) {
+                setSheetState(() => isSaving = false);
+                if (mounted) {
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 16,
+                // Відступ знизу враховує висоту екранної клавіатури
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Декоративний індикатор зверху модального вікна
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCBD5E1),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Profile photo change',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F2439),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Попередній перегляд обраного/введеного фото
+                    Center(
+                      child: CircleAvatar(
+                        radius: 44,
+                        backgroundColor: const Color(0xFFE2EAF4),
+                        child: (previewUrl != null && previewUrl!.startsWith('https://'))
+                            ? ClipOval(
+                                child: Image.network(
+                                  previewUrl!,
+                                  width: 88,
+                                  height: 88,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.broken_image_outlined,
+                                    size: 36,
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
+                              )
+                            : const Icon(Icons.person, size: 44, color: Color(0xFF0F2439)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    const Text(
+                      'Choose a photo',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Горизонтальний набір готових зображень
+                    SizedBox(
+                      height: 60,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _presetAvatars.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (_, index) {
+                          final avatarUrl = _presetAvatars[index];
+                          final isSelected = previewUrl == avatarUrl;
+
+                          return GestureDetector(
+                            onTap: () {
+                              setSheetState(() {
+                                previewUrl = avatarUrl;
+                                urlController.text = avatarUrl;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF0F2439)
+                                      : Colors.transparent,
+                                  width: 2.5,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 26,
+                                backgroundColor: const Color(0xFFE2EAF4),
+                                backgroundImage: NetworkImage(avatarUrl),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Поле для власного HTTPS-посилання
+                    TextFormField(
+                      controller: urlController,
+                      keyboardType: TextInputType.url,
+                      decoration: EnterInputDecorations.standard(
+                        hintText: 'Or put a HTTPS-link',
+                        icon: Icons.link_rounded,
+                        suffixIcon: urlController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 18, color: Color(0xFF64748B)),
+                                onPressed: () {
+                                  setSheetState(() {
+                                    urlController.clear();
+                                    previewUrl = _currentPhotoUrl;
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) {
+                        setSheetState(() {
+                          previewUrl = value.trim();
+                        });
+                      },
+                      validator: (val) {
+                        if (val == null || val.trim().isEmpty) {
+                          return 'Choose a photo prom the list above or put a photo link';
+                        }
+                        final trimmed = val.trim();
+                        final uri = Uri.tryParse(trimmed);
+                        if (uri == null ||
+                            !uri.hasScheme ||
+                            uri.scheme != 'https' ||
+                            uri.host.isEmpty) {
+                          return 'The link must start with "https://"';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Кнопки дій
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: isSaving ? null : () => Navigator.pop(sheetContext),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(48),
+                              side: const BorderSide(color: Color(0xFFCBD5E1)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(color: Color(0xFF64748B)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isSaving ? null : handleSave,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(48),
+                              backgroundColor: const Color(0xFF0F2439),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: isSaving
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Save',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() {
+      // Безпечно звільняємо контролер після закриття вікна
+      urlController.dispose();
+    });
   }
 }

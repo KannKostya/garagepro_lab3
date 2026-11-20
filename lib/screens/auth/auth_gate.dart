@@ -1,19 +1,33 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:garagepro/screens/main_screen.dart';
-import '../../repositories/auth_repository.dart';
 import 'login_screen.dart';
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  // Зберігаємо потік один раз при створенні віджета
+  late final Stream<User?> _authStream;
+
+  @override
+  void initState() {
+    super.initState();
+    // userChanges() реагує на вхід, вихід ТА оновлення профілю (displayName)
+    _authStream = FirebaseAuth.instance.userChanges();
+  }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: AuthRepository().authStateChanges,
+      stream: _authStream,
+      initialData: FirebaseAuth.instance.currentUser,
       builder: (context, snapshot) {
-        // Очікування відповіді від Firebase при запуску
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
           return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(color: Color(0xFF0F2439)),
@@ -21,13 +35,10 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        // Користувач авторизований
-        if (snapshot.hasData) {
-          // Замініть на ваш наявний екран (наприклад, ServiceHistoryScreen() або MainTabScreen())
+        if (snapshot.data != null) {
           return const MainScreen();
         }
 
-        // Користувач не авторизований
         return const LoginScreen();
       },
     );

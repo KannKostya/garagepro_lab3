@@ -144,4 +144,18 @@ class AuthRepository {
       throw 'Password verification error: $e';
     }
   }
+
+  Future<void> updatePhotoUrl(String newPhotoUrl) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) throw 'User is not authorised';
+
+      await user.updatePhotoURL(newPhotoUrl);
+      await user.reload();
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw 'Updating profile photo error: $e';
+    }
+  }
 }

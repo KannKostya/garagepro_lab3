@@ -16,10 +16,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+  final _termsFieldKey = GlobalKey<FormFieldState<bool>>();
+
   final AuthRepository _authRepository = AuthRepository();
 
-  bool _isChecked = false;
+  bool _isTermsAccepted = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -54,7 +55,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
       setState(() {
@@ -366,66 +367,107 @@ class RegistrationScreenState extends State<RegistrationScreen> {
 
                     const SizedBox(height: 16),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 25,
-                          height: 25,
-                          child:
-
-                            Checkbox(
-                              value: _isChecked,
-                              onChanged: (bool? value) {
+                    FormField<bool>(
+                      key: _termsFieldKey,
+                      initialValue: _isTermsAccepted,
+                      validator: (value) {
+                        if (!_isSubmitted) return null;
+                        if (!_isTermsAccepted) {
+                          return 'You need to agree to continue';
+                        }
+                        return null;
+                      },
+                      builder: (FormFieldState<bool> state) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              borderRadius: BorderRadius.circular(8),
+                              onTap: () {
                                 setState(() {
-                                  _isChecked = value ?? false;
+                                  _isTermsAccepted = !_isTermsAccepted;
                                 });
+                                state.didChange(_isTermsAccepted);
+                                if (_isTermsAccepted && state.hasError) {
+                                  state.reset();
+                                }
                               },
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
-                              activeColor: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2.5),
-                              ),
-                              side: BorderSide(
-                                color: Color(0xFF767676),
-                                width: 1,
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: _isTermsAccepted,
+                                    activeColor: const Color(0xFF0F2439),
+                                    side: BorderSide(
+                                      color: state.hasError ? Colors.red.shade800 : const Color(0xFF64748B),
+                                      width: 1.5,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        _isTermsAccepted = value ?? false;
+                                        _isSubmitted = false;
+                                      });
+                                      state.didChange(_isTermsAccepted);
+                                      if (_isTermsAccepted && state.hasError) {
+                                        state.reset();
+                                      }
+                                    },
+                                  ),
+                                  const Expanded(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'I agree on the ',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0xFF43474C),
+                                          ),
+                                        ),
+
+                                        Text(
+                                          'Terms of Service',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0xFF3E6186),
+                                          ),
+                                        ),
+
+                                        Text(
+                                          ' and ',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0xFF43474C),
+                                          ),
+                                        ),
+
+                                        Text(
+                                          'Privacy Policy',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0xFF3E6186),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                        ),
-
-                        const Text(
-                          'I agree on the ',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF43474C),
-                          ),
-                        ),
-
-                        const Text(
-                          'Terms of Service',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF3E6186),
-                          ),
-                        ),
-
-                        const Text(
-                          ' and ',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF43474C),
-                          ),
-                        ),
-
-                        const Text(
-                          'Privacy Policy',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF3E6186),
-                          ),
-                        ),
-                      ],
+                            // Виведення тексту помилки валідації під чекбоксом
+                            if (state.hasError)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 12, top: 0),
+                                child: Text(
+                                  state.errorText!,
+                                  style: TextStyle(color: Colors.red.shade800, fontSize: 12),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -488,10 +530,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
 
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      );
+                      Navigator.pop(context);
                     },
                     child: const Text(
                       'Sign In >',

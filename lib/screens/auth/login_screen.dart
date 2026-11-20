@@ -51,10 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } finally {
       if (mounted) {
-
+        
         setState(() {
           _isLoading = false;
         });
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }
