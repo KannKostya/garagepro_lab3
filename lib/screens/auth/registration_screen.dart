@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/custom_input_decoration.dart';
-import '../auth/login_screen.dart';
 import '../../repositories/auth_repository.dart';
 
 class RegistrationScreen extends StatefulWidget {

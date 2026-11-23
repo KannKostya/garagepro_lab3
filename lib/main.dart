@@ -9,19 +9,21 @@ import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 Future<void> main() async{
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
   await SentryFlutter.init(
     (options) {
       options.dsn = 'https://b3823d9c88f190f338683f50e48b555b@o4512409438191616.ingest.de.sentry.io/4512409453658192';
       
       options.tracesSampleRate = 1.0;
     },
-    appRunner: () => runApp(const MyApp()),
+    appRunner: () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
+      runApp(const MyApp());
+    },
   );
 }
 

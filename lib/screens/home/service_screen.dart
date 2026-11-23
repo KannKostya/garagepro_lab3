@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../main_screen.dart';
 import 'dart:ui';
+import '../../core/widgets/service_record_card.dart';
+import '../../models/service_record.dart';
 
 class ServiceScreen extends StatefulWidget {
   final bool showBackButton;
@@ -28,6 +30,53 @@ class _ServiceScreenState extends State<ServiceScreen>{
   ];
 
   String _selectedCategory = 'All';
+
+  final List<ServiceRecord> initialRecords = [
+    const ServiceRecord(
+      id: '1',
+      title: 'Brake Pad Replacement',
+      date: 'Sept 10, 2023',
+      mileage: 142500,
+      category: 'Suspension',
+      parts: 'Ceramic pads, rotors',
+      shop: 'AutoShop Pro',
+      cost: 280.00,
+      icon: Icons.album_outlined,
+    ),
+    const ServiceRecord(
+      id: '2',
+      title: 'Tire Rotation & Balance',
+      date: 'Aug 22, 2023',
+      mileage: 139000,
+      category: 'Maintenance',
+      parts: 'Wheel weights',
+      shop: 'City Tires',
+      cost: 85.00,
+      icon: Icons.replay,
+    ),
+    const ServiceRecord(
+      id: '3',
+      title: 'Synthetic Oil Change',
+      date: 'Jun 15, 2023',
+      mileage: 135000,
+      category: 'Engine',
+      parts: '5W-30 Oil, Filter',
+      shop: 'QuickLube',
+      cost: 65.00,
+      icon: Icons.oil_barrel_outlined,
+    ),
+    const ServiceRecord(
+      id: '4',
+      title: 'Spark Plug Replavement',
+      date: 'Apr 04, 2023',
+      mileage: 128000,
+      category: 'Engine',
+      parts: 'Bosch Iridium (4)',
+      shop: 'Apex Motors',
+      cost: 120.00,
+      icon: Icons.electric_bolt_sharp,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -104,881 +153,228 @@ class _ServiceScreenState extends State<ServiceScreen>{
 				),
       ),
       
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-
-                if(widget.showBackButton) ...[
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      MainScreen.of(context)?.setIndex(0);
-                    },
-                    customBorder: const CircleBorder(),
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFECEEF1),
-                        shape: BoxShape.circle,
+      body: CustomScrollView(
+        slivers: [
+          // 1. Верхня частина екрана (шапка, пошук, фільтри)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Шапка екрана
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      if (widget.showBackButton) ...[
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              MainScreen.of(context)?.setIndex(0);
+                            },
+                            customBorder: const CircleBorder(),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFECEEF1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back,
+                                color: Color(0xFF0F2439),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                      ],
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Service History',
+                            style: TextStyle(
+                              color: Color(0xFF03192A),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Track all repairs and routine maintenance',
+                            style: TextStyle(
+                              color: Color(0xFF43474C),
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: const Icon(
-                        Icons.arrow_back,
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Рядок пошуку
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFECEEF1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      onChanged: (value) {
+                        // Сюди додасте фільтрацію списку за текстом пошуку
+                      },
+                      style: const TextStyle(
                         color: Color(0xFF0F2439),
-                        size: 20,
+                        fontSize: 14,
+                      ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFECEEF1),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFF74777D),
+                          size: 22,
+                        ),
+                        hintText: 'Search service records...',
+                        hintStyle: const TextStyle(
+                          color: Color(0xFF74777D),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.tune,
+                            color: Color(0xFF74777D),
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showFilters = !_showFilters;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(width: 16),
-                
-                ],
+                  // Горизонтальний список фільтрів категорій
+                  if (_showFilters) ...[
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 34, // Фіксована висота для горизонтального ListView
+                      child: ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context).copyWith(
+                          dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
+                            PointerDeviceKind.trackpad,
+                          },
+                        ),
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _categories.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (context, index) {
+                            final category = _categories[index];
+                            final bool isSelected = _selectedCategory == category;
 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Service History',
-                      style: TextStyle(
-                        color: Color(0xFF03192A),
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const Text(
-                      'Track all repairs and routine maintenance',
-                      style: TextStyle(
-                        color: Color(0xFF43474C),
-                        fontSize: 12,
-                        fontWeight: FontWeight.normal,
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedCategory = category;
+                                });
+                                widget.onCategorySelected?.call(category);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFF03192A)
+                                      : const Color(0xFFE6E8EB),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    category,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.normal,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : const Color(0xFF43474C),
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
-                )
-              ],
-            ),
 
-            const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFECEEF1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TextField(
-                style: const TextStyle(
-                  color: Color(0xFF0F2439),
-                  fontSize: 14,
-                ),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  
-                  filled: true,
-                  fillColor: const Color(0xFFECEEF1),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                  
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Color(0xFF74777D),
-                    size: 22,
-                  ),
-                  
-                  hintText: 'Search service records...',
-                  hintStyle: const TextStyle(
-                    color: Color(0xFF74777D),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  
-                  suffixIcon: IconButton(
-                    icon: const Icon(
-                      Icons.tune,
-                      color: Color(0xFF74777D),
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _showFilters = !_showFilters;
-                      });
-                    },
-                  ),
-                ),
+                  ],
               ),
             ),
+          ),
 
-            if(_showFilters) ...[
-              const SizedBox(height: 16),
-                  
-              ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(
-                  dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                    PointerDeviceKind.trackpad,
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            sliver: SliverList.separated(
+              itemCount: initialRecords.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final record = initialRecords[index];
+                return ServiceRecordCard(
+                  record: record,
+                  onTap: () {
+                    // Перехід на екран перегляду або редагування запису (п. 1.2)
                   },
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _categories.map((category) {
-                      final bool isSelected = _selectedCategory == category;
-
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedCategory = category;
-                            });
-                            widget.onCategorySelected?.call(category);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFF03192A)
-                                  : const Color(0xFFE6E8EB),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                                color: isSelected
-                                    ? Colors.white
-                                    : const Color(0xFF43474C),
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ), 
-            ],
-
-            const SizedBox(height: 16),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F4F7),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFAFD2FD),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(
-                          Icons.album_outlined, // Або Icons.adjust, Icons.disc_full_outlined
-                          color: Color(0xFF375A7F),
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Brake Pad Replacement',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF191C1E),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Sept 10, 2023 • 142,500 km',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF43474C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A2E40),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Completed',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF8296AB),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFECEEF1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Parts:',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'Ceramic pads, rotors',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Shop:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'AutoShop Pro',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '\$280.00',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF0F2439),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          //
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Text(
-                              'Download Receipt',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF3F6D9B), 
-                              ),
-                            ),
-                            SizedBox(width: 2),
-                            Icon(
-                              Icons.chevron_right,
-                              size: 18,
-                              color: Color(0xFF3F6D9B),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                  onDownloadReceipt: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Receipt for ${record.title} downloaded')),
+                    );
+                  },
+                );
+              },
             ),
-
-            const SizedBox(height: 16),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F4F7),
-                borderRadius: BorderRadius.circular(12),
-              ),
+          ),
+          
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            sliver: SliverToBoxAdapter(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFAFD2FD),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(
-                          Icons.replay,
-                          color: Color(0xFF375A7F),
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Tire Rotation & Balance',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF191C1E),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Aug 22, 2023 • 139,000 km',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF43474C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A2E40),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Completed',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF8296AB),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFECEEF1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Parts:',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'Wheel weights',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Shop:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'City Tires',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '\$85.00',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF0F2439),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          //
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Text(
-                              'Download Receipt',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF3F6D9B),
-                              ),
-                            ),
-                            SizedBox(width: 2),
-                            Icon(
-                              Icons.chevron_right,
-                              size: 18,
-                              color: Color(0xFF3F6D9B),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  Text(
+                    'All records verified and synced with GaragePro Cloud.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                      color: Color(0xFF74777D),
+                    )
+                  )
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F4F7),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFAFD2FD),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(
-                          Icons.oil_barrel_outlined,
-                          color: Color(0xFF375A7F),
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Synthetic Oil Change',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF191C1E),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Jun 15, 2023 • 135,000 km',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF43474C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A2E40),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Completed',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF8296AB),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFECEEF1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Parts:',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              '5W-30 Oil, Filter',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Shop:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'QuickLube',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '\$65.00',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF0F2439),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          //
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Text(
-                              'Download Receipt',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF3F6D9B),
-                              ),
-                            ),
-                            SizedBox(width: 2),
-                            Icon(
-                              Icons.chevron_right,
-                              size: 18,
-                              color: Color(0xFF3F6D9B),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F4F7),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFAFD2FD),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(
-                          Icons.electric_bolt_sharp,
-                          color: Color(0xFF375A7F),
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Spark Plug Replacement',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF191C1E),
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Apr 04, 2023 • 128,000 km',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF43474C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A2E40),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Completed',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF8296AB),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFECEEF1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Parts:',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'Bosch Iridium (4)',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Shop:',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF758391),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              'Apex Motors',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F2439),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '\$120.00',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF0F2439),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          //
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Text(
-                              'Download Receipt',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF3F6D9B),
-                              ),
-                            ),
-                            SizedBox(width: 2),
-                            Icon(
-                              Icons.chevron_right,
-                              size: 18,
-                              color: Color(0xFF3F6D9B),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            const Text(
-              'All records verified and synced with GaragePro Cloud.',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
-                color: Color(0xFF74777D),
               )
-            )
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
